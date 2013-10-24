@@ -229,6 +229,7 @@ getProcessToCssNumMapping = (processes) ->
   cssMapping
 
 
+# Initialize a Racer Puzzle
 Module.initPuzzle = initPuzzle = (root) ->
   puzzleSpec = Module[root.attr "data-puzzleset"]
   if not puzzleSpec?
@@ -246,7 +247,8 @@ Module.initPuzzle = initPuzzle = (root) ->
   root.append(createElement("div")
     .attr("data-role", "executionResult"))
   
-  createPuzzleOutput root, puzzleSet.finish, cssMapping
+  if puzzleSpec.finish?
+    createPuzzleOutput root, puzzleSet.finish, cssMapping
 
   fillInCommandsColumn root, puzzleSet.processes, ordering.ordering, cssMapping
   root.append(createElement("button")
@@ -262,6 +264,7 @@ printMemoryState = (element, name, num, values) ->
   for field, value of values
     element.append(createElement("div")
       .text(field + ": " + value))
+  element
 
 # Note: Update the first column by calling fillInCommands first!
 Module.executePuzzle = executePuzzle = (root, puzzleSet, ordering, cssMapping) ->
@@ -285,7 +288,9 @@ Module.executePuzzle = executePuzzle = (root, puzzleSet, ordering, cssMapping) -
         processes[processName].getState()
     printMemoryState cells.eq(-1), "shared", -1,
       puzzleSet.memories["shared"].state.values
-  finishExecution root, puzzleSet
+
+  if puzzleSet.finish?
+    finishExecution root, puzzleSet
 
 finishExecution = (root, puzzleSet) ->
   diff = puzzleSet.checkFinish()
@@ -305,6 +310,7 @@ finishExecution = (root, puzzleSet) ->
 createPuzzleTable = (root, puzzleSet, ordering, cssMapping) ->
   alignedProcessLabels = []
   processStateLabels = []
+  processStartStates = []
   rowTemplate = createElement("tr")
     .append(createElement("td").addClass("alignedCode"))
   for processName,cssNum of cssMapping
@@ -312,6 +318,9 @@ createPuzzleTable = (root, puzzleSet, ordering, cssMapping) ->
       .addClass("process" + cssNum).text("Process " + processName)
     processStateLabels[cssNum] = createElement("th")
       .addClass("process" + cssNum).text(processName + " Memory State")
+    processStartStates[cssNum] = printMemoryState(
+      createElement("td").addClass("process" + cssNum).addClass("code"),
+      processName, cssNum, puzzleSet.memories[processName].state.values)
     rowTemplate.append(createElement("td").addClass("process" + cssNum))
   rowTemplate.append(createElement("td"))
 
@@ -323,6 +332,13 @@ createPuzzleTable = (root, puzzleSet, ordering, cssMapping) ->
       .append(processStateLabels)
       .append(createElement("th")
         .text("Shared Memory State")))
+    .append(createElement("tr")
+      .append(createElement("td")
+        .text("---initial state---").addClass("codeDesc"))
+      .append(processStartStates)
+      .append(printMemoryState(createElement("td").addClass("code"),
+        "shared", -1, puzzleSet.memories["shared"].state.values)))
+
   tbody = createElement("tbody")
   for processName in ordering
     tbody.append(rowTemplate.clone())

@@ -426,7 +426,9 @@
     root.data("puzzleSet", puzzleSet).data("ordering", ordering).data("cssMapping", cssMapping);
     createPuzzleTable(root, puzzleSet, ordering.ordering, cssMapping);
     root.append(createElement("div").attr("data-role", "executionResult"));
-    createPuzzleOutput(root, puzzleSet.finish, cssMapping);
+    if (puzzleSpec.finish != null) {
+      createPuzzleOutput(root, puzzleSet.finish, cssMapping);
+    }
     fillInCommandsColumn(root, puzzleSet.processes, ordering.ordering, cssMapping);
     return root.append(createElement("button").attr("type", "button").addClass("btn").addClass("btn-primary").text("Execute!").click((function() {
       return function() {
@@ -436,16 +438,15 @@
   };
 
   printMemoryState = function(element, name, num, values) {
-    var field, value, _results;
+    var field, value;
     if (name !== "shared") {
       element.addClass("process" + num);
     }
-    _results = [];
     for (field in values) {
       value = values[field];
-      _results.push(element.append(createElement("div").text(field + ": " + value)));
+      element.append(createElement("div").text(field + ": " + value));
     }
-    return _results;
+    return element;
   };
 
   Module.executePuzzle = executePuzzle = function(root, puzzleSet, ordering, cssMapping) {
@@ -474,7 +475,9 @@
       }
       printMemoryState(cells.eq(-1), "shared", -1, puzzleSet.memories["shared"].state.values);
     }
-    return finishExecution(root, puzzleSet);
+    if (puzzleSet.finish != null) {
+      return finishExecution(root, puzzleSet);
+    }
   };
 
   finishExecution = function(root, puzzleSet) {
@@ -488,18 +491,20 @@
   };
 
   createPuzzleTable = function(root, puzzleSet, ordering, cssMapping) {
-    var alignedProcessLabels, cssNum, processName, processStateLabels, rowTemplate, table, tbody, thead, _i, _len;
+    var alignedProcessLabels, cssNum, processName, processStartStates, processStateLabels, rowTemplate, table, tbody, thead, _i, _len;
     alignedProcessLabels = [];
     processStateLabels = [];
+    processStartStates = [];
     rowTemplate = createElement("tr").append(createElement("td").addClass("alignedCode"));
     for (processName in cssMapping) {
       cssNum = cssMapping[processName];
       alignedProcessLabels[cssNum] = createElement("div").addClass("process" + cssNum).text("Process " + processName);
       processStateLabels[cssNum] = createElement("th").addClass("process" + cssNum).text(processName + " Memory State");
+      processStartStates[cssNum] = printMemoryState(createElement("td").addClass("process" + cssNum).addClass("code"), processName, cssNum, puzzleSet.memories[processName].state.values);
       rowTemplate.append(createElement("td").addClass("process" + cssNum));
     }
     rowTemplate.append(createElement("td"));
-    thead = createElement("thead").append(createElement("tr").append(createElement("th").addClass("alignedCode").append(alignedProcessLabels)).append(processStateLabels).append(createElement("th").text("Shared Memory State")));
+    thead = createElement("thead").append(createElement("tr").append(createElement("th").addClass("alignedCode").append(alignedProcessLabels)).append(processStateLabels).append(createElement("th").text("Shared Memory State"))).append(createElement("tr").append(createElement("td").text("---initial state---").addClass("codeDesc")).append(processStartStates).append(printMemoryState(createElement("td").addClass("code"), "shared", -1, puzzleSet.memories["shared"].state.values)));
     tbody = createElement("tbody");
     for (_i = 0, _len = ordering.length; _i < _len; _i++) {
       processName = ordering[_i];
