@@ -5,7 +5,7 @@ window.RaceCode = Module
 
 # --------------Utility Code----------------
 extend = (obj, mixin) ->
-  obj[name] = (method for name, method of mixin)
+  (obj[name] = method for name, method of mixin)
   obj
 
 copy = (obj) ->
@@ -77,17 +77,20 @@ Module.CommandType = class CommandType
   execute: ->
     throw new ReferenceError "Execute function not implemented!"
 
+Module.ExecutionError = class ExecutionError extends Error
+  constructor: (@message) ->
+
 # Get a variable from shared memory and put it in local
 Module.GetShared = class GetShared extends CommandType
   constructor: (@localVar, @sharedVar) ->
-    super "Get " + @localVar.name + " from shared memory " + @sharedVar.name
+    super "Get " + @localVar.name + " from shared." + @sharedVar.name
   execute: ->
     @localVar.set @sharedVar.get()
 
 # Set a variable in shared memory to be value in local
 Module.SetShared = class SetShared extends CommandType
   constructor: (@localVar, @sharedVar) ->
-    super "Set shared memory " + @sharedVar.name + " with " + @localVar.name
+    super "Set shared." + @sharedVar.name + " with " + @localVar.name
   execute: ->
     @sharedVar.set @localVar.get()
 
@@ -101,7 +104,7 @@ Module.Lock = class Lock extends CommandType
     if lockOwner == false
       @sharedLockVar.set @processName
     else
-      throw new Error "Can not get lock " + @sharedLockVar.name +
+      throw new ExecutionError "Can not get lock " + @sharedLockVar.name +
         "; currently held by process " + lockOwner
 
 # Release a lock acquired by the process
@@ -115,16 +118,16 @@ Module.Unlock = class Unlock extends CommandType
     if lockOwner == @processname
       @sharedLockVar.set false
     else if lockOwner == false
-      throw new Error "Can not release lock not held by any process!"
+      throw new ExecutionError "Can not release lock not held by any process!"
     else
-      throw new Error "Can not release lock not held by process " + lockOwner
+      throw new ExecutionError "Can not release lock not held by process " + lockOwner
 
 # Increment a variable by x
 Module.Increment = class Increment extends CommandType
   constructor: (@variable, @increment) ->
-    super "Increment " + @variable + " by " + @increment
+    super "Increment " + @variable.name + " by " + @increment
   execute: ->
-    @variable.set @variable.get + @increment
+    @variable.set @variable.get() + @increment
 
 # --------------Puzzle Operation-------------
 
@@ -169,7 +172,7 @@ Module.PuzzleSet = class PuzzleSet
   checkFinish: ->
     errors = []
     for memory,finals of @finish
-      values = @memories[memory]
+      values = @memories[memory].state.values
       for name, value of finals
         if values[name] != value
           errors.push {memory: memory, expected: value, actual: values[name]}
@@ -199,20 +202,20 @@ Module.simpleRace =
     A:
       memory: {}
       commands: [
-        { type: "Get", local: "a", shared: "balance" },
-        { type: "Increment", variable: "a", increment: 3 },
-        { type: "Set", local: "a", shared: "balance" }
+        { type: "Get", local: "atemp", shared: "balance" },
+        { type: "Increment", variable: "atemp", increment: 3 },
+        { type: "Set", local: "atemp", shared: "balance" }
       ]
     B:
       memory: {}
       commands: [
-        { type: "Get", local: "b", shared: "balance" },
-        { type: "Increment", variable: "b", increment: -7 },
-        { type: "Set", local: "b", shared: "balance" }
+        { type: "Get", local: "btemp", shared: "balance" },
+        { type: "Increment", variable: "btemp", increment: -7 },
+        { type: "Set", local: "btemp", shared: "balance" }
       ]
   finish:
     shared:
-      balance: 100
+      balance: 96
 
 
 # --------------Racer View--------------------
@@ -238,14 +241,77 @@ Module.initPuzzle = initPuzzle = (root) ->
       .data("ordering", ordering)
       .data("cssMapping", cssMapping)
 
+  createPuzzleTable root, puzzleSet, ordering.ordering, cssMapping
+  
+  createPuzzleOutput root, puzzleSet.finish, cssMapping
+
+  fillInCommandsColumn root, puzzleSet.processes, ordering.ordering, cssMapping
+
+  root
+    .append(createElement("div")
+      .attr("data-role", "executionResult"))
+    .append(createElement("button")
+      .attr("type", "button")
+      .addClass("btn")
+      .addClass("btn-primary")
+      .text("Execute!")
+      .click(do -> () -> executePuzzle root, puzzleSet, ordering, cssMapping))
+
+printMemoryState = (element, name, num, values) ->
+  if name != "shared"
+    element.addClass("process" + num)
+  for field, value of values
+    element.append(createElement("div")
+      .text(field + ": " + value))
+
+# Note: Update the first column by calling fillInCommands first!
+Module.executePuzzle = executePuzzle = (root, puzzleSet, ordering, cssMapping) ->
+  puzzleSet.reset()
+  processes = puzzleSet.processes
+  rows = root.find "tbody tr"
+  for row in rows
+    cells = $(row).children()
+    processName = cells.first().children().first().data("processName")
+    try
+      processes[processName].step()
+    catch error
+      if error instanceof ExecutionError
+        cells.eq(1+cssMapping[processName])
+          .text("HALT: " + error.message)
+        break
+      else
+        throw error
+    for processName, cssNum of cssMapping
+      printMemoryState cells.eq(1+cssNum), processName, cssNum,
+        processes[processName].getState()
+    printMemoryState cells.eq(-1), "shared", -1,
+      puzzleSet.memories["shared"].state.values
+  diff = puzzleSet.checkFinish()
+  if diff.length > 0
+    root.find("[data-role='executionResult']").empty()
+      .append(createElement("div")
+        .addClass("alert")
+        .addClass("alert-success")
+        .text("Congratulations! You found an execution order which breaks the program!"))
+  else
+    root.find("[data-role='executionResult']").empty()
+      .append(createElement("div")
+        .addClass("alert")
+        .addClass("alert-warning")
+        .text("This execution order comes out correct. Try ordering them differently!"))
+
+createPuzzleTable = (root, puzzleSet, ordering, cssMapping) ->
   alignedProcessLabels = []
   processStateLabels = []
+  rowTemplate = createElement("tr")
+    .append(createElement("td").addClass("alignedCode"))
   for processName,cssNum of cssMapping
     alignedProcessLabels[cssNum] = createElement("div")
-      .addClass("process" + cssNum).text(processName)
+      .addClass("process" + cssNum).text("Process " + processName)
     processStateLabels[cssNum] = createElement("th")
-      .addClass("process" + cssNum)
-      .text(processName + " Memory State")
+      .addClass("process" + cssNum).text(processName + " Memory State")
+    rowTemplate.append(createElement("td").addClass("process" + cssNum))
+  rowTemplate.append(createElement("td"))
 
   thead = createElement("thead")
     .append(createElement("tr")
@@ -256,12 +322,39 @@ Module.initPuzzle = initPuzzle = (root) ->
       .append(createElement("th")
         .text("Shared Memory State")))
   tbody = createElement("tbody")
+  for processName in ordering
+    tbody.append(rowTemplate.clone())
 
   table = createElement("table")
     .addClass("puzzleTable")
     .append(thead)
     .append(tbody)
     .appendTo(root)
+
+createPuzzleOutput = (root, finish, cssMapping) ->
+  root.append(createElement("h4").text("Processes should complete with following memory state:"))
+  box = createElement("div")
+    .addClass("code")
+    .appendTo(root)
+  for name,data of finish
+    area = createElement("div").text(name + ":").appendTo(box)
+    printMemoryState area, name, cssMapping[name], data
+    area.children().addClass("indentleft")
+
+fillInCommandsColumn = (root, processes, ordering, cssMapping) ->
+  commandCells = root.find "tbody td:first-child"
+  commands = {}
+  ordering = ordering.slice(0)
+  for processName, process of processes
+    commands[processName] = process.commands.slice(0)
+  for cell in commandCells
+    processName = ordering.shift()
+    command = commands[processName].shift()
+    $(cell).empty()
+      .append(createElement("div")
+        .addClass("process" + cssMapping[processName])
+        .text(command.label)
+        .data("processName", processName))
 
 
 # --------------Ready Function----------------
