@@ -5,11 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="css/styles.css" rel="stylesheet" media="screen">
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <link href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet">
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
+    <!-- Less -->
+    <link href="style.less" rel="stylesheet/less" type="text/css" />
+    <script src="js/less.min.js"></script>
+
     <script src="js/code.js"></script>
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -21,10 +26,14 @@
   <body>
     <div class="container">
       <div class="page-header">
-        <h1>My Puzzle<h1>
+        <h1>Find my race!<h1>
         <p class="lead">
-          Ipsum lorem
+          We've given you a pair of programs that work together to
+          accomplish something. Will our programs work correctly?
+          Find an interleaving of executions which makes it not so.
         </p>
+      </div>
+      <div data-role="racerpuzzle" data-puzzleset="simpleRace">
       </div>
     </div>
   </body>
