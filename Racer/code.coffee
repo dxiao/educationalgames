@@ -242,20 +242,19 @@ Module.initPuzzle = initPuzzle = (root) ->
       .data("cssMapping", cssMapping)
 
   createPuzzleTable root, puzzleSet, ordering.ordering, cssMapping
+
+  root.append(createElement("div")
+    .attr("data-role", "executionResult"))
   
   createPuzzleOutput root, puzzleSet.finish, cssMapping
 
   fillInCommandsColumn root, puzzleSet.processes, ordering.ordering, cssMapping
-
-  root
-    .append(createElement("div")
-      .attr("data-role", "executionResult"))
-    .append(createElement("button")
-      .attr("type", "button")
-      .addClass("btn")
-      .addClass("btn-primary")
-      .text("Execute!")
-      .click(do -> () -> executePuzzle root, puzzleSet, ordering, cssMapping))
+  root.append(createElement("button")
+    .attr("type", "button")
+    .addClass("btn")
+    .addClass("btn-primary")
+    .text("Execute!")
+    .click(do -> () -> executePuzzle root, puzzleSet, ordering, cssMapping))
 
 printMemoryState = (element, name, num, values) ->
   if name != "shared"
@@ -286,6 +285,9 @@ Module.executePuzzle = executePuzzle = (root, puzzleSet, ordering, cssMapping) -
         processes[processName].getState()
     printMemoryState cells.eq(-1), "shared", -1,
       puzzleSet.memories["shared"].state.values
+  finishExecution root, puzzleSet
+
+finishExecution = (root, puzzleSet) ->
   diff = puzzleSet.checkFinish()
   if diff.length > 0
     root.find("[data-role='executionResult']").empty()
@@ -297,7 +299,7 @@ Module.executePuzzle = executePuzzle = (root, puzzleSet, ordering, cssMapping) -
     root.find("[data-role='executionResult']").empty()
       .append(createElement("div")
         .addClass("alert")
-        .addClass("alert-warning")
+        .addClass("alert-danger")
         .text("This execution order comes out correct. Try ordering them differently!"))
 
 createPuzzleTable = (root, puzzleSet, ordering, cssMapping) ->
