@@ -138,7 +138,7 @@
   };
 
   Module.executePuzzle = executePuzzle = function(root) {
-    var cells, cssMapping, cssNum, error, ordering, processName, processes, puzzleSet, row, rows, step, _i, _len;
+    var cells, cssMapping, cssNum, error, memories, memory, name, ordering, processName, processes, puzzleSet, row, rows, step, _i, _len, _ref;
     puzzleSet = root.data("puzzleSet");
     ordering = root.data("ordering");
     cssMapping = root.data("cssMapping");
@@ -158,6 +158,14 @@
         error = _error;
         if (error instanceof RacerCode.ExecutionError) {
           cells.eq(1 + cssMapping[processName]).text("INVALID INTERLEAVING: " + error.message);
+          $.ajax("monitoring", {
+            type: "POST",
+            data: {
+              ordering: JSON.stringify(ordering.ordering, {
+                finalState: "INVALID: " + error.message
+              })
+            }
+          });
           break;
         } else {
           throw error;
@@ -170,11 +178,25 @@
       printMemoryState(cells.eq(-1), "shared", -1, puzzleSet.memories["shared"].state.values);
     }
     if (puzzleSet.finish != null) {
-      return finishExecution(root, puzzleSet);
+      finishExecution(root, ordering, puzzleSet);
     }
+    memories = {};
+    _ref = puzzleSet.memories;
+    for (name in _ref) {
+      memory = _ref[name];
+      memories[name] = memory.state.values;
+    }
+    return $.ajax("monitoring", {
+      type: "POST",
+      data: {
+        puzzle: puzzleSet.name,
+        ordering: ordering.ordering,
+        finalState: memories
+      }
+    });
   };
 
-  finishExecution = function(root, puzzleSet) {
+  finishExecution = function(root, ordering, puzzleSet) {
     var diff;
     diff = puzzleSet.checkFinish();
     if (diff.length > 0) {

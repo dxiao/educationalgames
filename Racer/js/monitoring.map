@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "monitoring.js",
+  "sourceRoot": "..",
+  "sources": [
+    "monitoring.coffee"
+  ],
+  "names": [],
+  "mappings": ";AAAA;CAAA,KAAA,oBAAA;;CAAA,CAAA,CAAE,MAAA;CACY,CAAa,EAAzB,OAAA;CADF,EAAE;;CAAF,CAGA,CAAgB,MAAC,IAAjB;CACE,EAAE,KAAQ,GAAV,EAAE;CAJJ,EAGgB;;CAHhB,CAMA,CAAc,MAAA,EAAd;CACG,EAAyB,CAA1B,KAA2B,EAA3B,CAAA;CACE,SAAA,eAAA;AAAA,CAAA;YAAA,+BAAA;0BAAA;CACE,GAAmB,CACsB,CADtB,CAAnB,EAKmC,IALhB;CADrB;uBADwB;CAA1B,IAA0B;CAP5B,EAMc;CANd"
+}

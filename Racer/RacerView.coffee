@@ -174,6 +174,12 @@ Module.executePuzzle = executePuzzle = (root) ->
       if error instanceof RacerCode.ExecutionError
         cells.eq(1+cssMapping[processName])
           .text("INVALID INTERLEAVING: " + error.message)
+        $.ajax "monitoring", {
+          type: "POST"
+          data: {
+            ordering: JSON.stringify ordering.ordering,
+            finalState: "INVALID: " + error.message
+          } }
         break
       else
         throw error
@@ -184,10 +190,21 @@ Module.executePuzzle = executePuzzle = (root) ->
       puzzleSet.memories["shared"].state.values
 
   if puzzleSet.finish?
-    finishExecution root, puzzleSet
+    finishExecution root, ordering, puzzleSet
+
+  memories = {}
+  for name, memory of puzzleSet.memories
+    memories[name] = memory.state.values
+  $.ajax "monitoring", {
+    type: "POST"
+    data: {
+      puzzle: puzzleSet.name
+      ordering: ordering.ordering
+      finalState: memories
+    } }
 
 # Compare the execution run and the goal state and note any comparisons
-finishExecution = (root, puzzleSet) ->
+finishExecution = (root, ordering, puzzleSet) ->
   diff = puzzleSet.checkFinish()
   if diff.length > 0
     root.find("[data-role='executionResult']").empty()

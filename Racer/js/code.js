@@ -2,8 +2,6 @@
 (function() {
   var Module, RacerView;
 
-  less.watch();
-
   Module = {};
 
   window.RaceCode = Module;
