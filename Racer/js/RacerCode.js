@@ -186,7 +186,7 @@
     Lock.prototype.execute = function() {
       var lockOwner;
       lockOwner = this.sharedLockVar.get();
-      if (lockOwner === false) {
+      if (lockOwner === false || lockOwner === this.processName) {
         return this.sharedLockVar.set(this.processName);
       } else {
         throw new ExecutionError("Can not get lock " + this.sharedLockVar.name + "; currently held by process " + lockOwner);
@@ -209,12 +209,12 @@
     Unlock.prototype.execute = function() {
       var lockOwner;
       lockOwner = this.sharedLockVar.get();
-      if (lockOwner === this.processname) {
+      if (lockOwner === this.processName) {
         return this.sharedLockVar.set(false);
       } else if (lockOwner === false) {
         throw new ExecutionError("Can not release lock not held by any process!");
       } else {
-        throw new ExecutionError("Can not release lock not held by process " + lockOwner);
+        throw new ExecutionError("Can not release lock held by process " + lockOwner);
       }
     };
 
@@ -250,7 +250,7 @@
       case "Lock":
         return new Lock(new Variable(command.lock, memories.shared), process);
       case "Unlock":
-        return new Unlock(new Variable(command.loc, memories.shared), process);
+        return new Unlock(new Variable(command.lock, memories.shared), process);
       default:
         throw new TypeError("Did not recognize command of type " + command.type);
     }

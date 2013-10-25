@@ -97,7 +97,7 @@ Module.Lock = class Lock extends CommandType
     super "Acquire lock " + @sharedLockVar.name
   execute: ->
     lockOwner = @sharedLockVar.get()
-    if lockOwner == false
+    if lockOwner == false or lockOwner == @processName
       @sharedLockVar.set @processName
     else
       throw new ExecutionError "Can not get lock " + @sharedLockVar.name +
@@ -111,12 +111,12 @@ Module.Unlock = class Unlock extends CommandType
     super "Release lock " + @sharedLockVar.name
   execute: ->
     lockOwner = @sharedLockVar.get()
-    if lockOwner == @processname
+    if lockOwner == @processName
       @sharedLockVar.set false
     else if lockOwner == false
       throw new ExecutionError "Can not release lock not held by any process!"
     else
-      throw new ExecutionError "Can not release lock not held by process " + lockOwner
+      throw new ExecutionError "Can not release lock held by process " + lockOwner
 
 # Increment a variable by x
 Module.Increment = class Increment extends CommandType
@@ -141,7 +141,7 @@ ParseCommand = (command, process, memories) ->
     when "Lock"
       new Lock new Variable(command.lock, memories.shared), process
     when "Unlock"
-      new Unlock new Variable(command.loc, memories.shared), process
+      new Unlock new Variable(command.lock, memories.shared), process
     else
       throw new TypeError "Did not recognize command of type " + command.type
 

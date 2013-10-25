@@ -137,8 +137,7 @@ fillInCommandsColumn = (root, processes, ordering, cssMapping) ->
     command = commands[processName].shift()
     $(cell).empty()
       .append(createElement("div")
-        .addClass("process" + cssMapping[processName])
-        .addClass("dragHandle")
+        .addClass("dragHandle process" + cssMapping[processName])
         .text(command.label)
         .data("commandOrder", {
           process: processName
@@ -146,6 +145,8 @@ fillInCommandsColumn = (root, processes, ordering, cssMapping) ->
         })
         .data("processName", processName)
         .attr("draggable", true)
+        .append(createElement("span")
+          .addClass("glyphicon glyphicon-resize-vertical"))
         .on("dragstart", startDrag))
       .off()
       .on("dragenter", onDragenter)
@@ -172,7 +173,7 @@ Module.executePuzzle = executePuzzle = (root) ->
     catch error
       if error instanceof RacerCode.ExecutionError
         cells.eq(1+cssMapping[processName])
-          .text("HALT: " + error.message)
+          .text("INVALID INTERLEAVING: " + error.message)
         break
       else
         throw error
@@ -230,6 +231,3 @@ onDragenter = (event) ->
     return false
   console.log "true"
   return true
-
-onDrop = (event) ->
-

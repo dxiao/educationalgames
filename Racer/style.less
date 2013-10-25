@@ -12,53 +12,74 @@
   }
 }
 
-th {
-  border-bottom: 1px solid lightGrey
-}
+[data-role=racerpuzzle] {
+  table {
+    table-layout:fixed;
 
-.code {
-  font-family: monospace;
-}
+    th {
+      border-bottom: 1px solid lightGrey
+    }
 
-.alignedCode {
-  .code;
-  
-  .process0 {
-    padding-left: 0em;
+    tr {
+      margin: .5em;
+    }
+    tr:nth-child(even) {
+      background: #EEE;
+    }
+
+    th:first-child {
+      width:40%;
+    }
   }
-  .process1 {
+
+  .code {
+    font-family: monospace;
+  }
+
+  .alignedCode {
+    .code;
+    
+    .process0 {
+      padding-left: 0em;
+    }
+    .process1 {
+      padding-left: 5em;
+    }
+    .process2 {
+      padding-left: 10em;
+    }
+  }
+
+  .codeDesc {
+    .code;
+    .indentleft;
+  }
+
+  .indentleft {
     padding-left: 5em;
   }
-  .process2 {
-    padding-left: 10em;
+
+  .process0 {
+    color: DarkRed
   }
-}
 
-.codeDesc {
-  .code;
-  .indentleft;
-}
+  .process1 {
+    color: DarkBlue
+  }
 
-.indentleft {
-  padding-left: 5em;
-}
+  .process2 {
+    color: DarkGreen
+  }
 
-.process0 {
-  color: DarkRed
-}
+  .puzzleTable {
+    width: 100%
+  }
 
-.process1 {
-  color: DarkBlue
-}
+  .dragHandle {
+    cursor: n-resize;
 
-.process2 {
-  color: DarkGreen
-}
-
-.puzzleTable {
-  width: 100%
-}
-
-.dragHandle {
-  cursor: n-resize;
+    .glyphicon {
+      float: left;
+    }
+  }
 }
