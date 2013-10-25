@@ -29,14 +29,46 @@
   <body>
     <div class="container">
       <div class="page-header">
-        <h1>Find my race!<h1>
+        <h1>Concurrency and Locking</h1>
         <p class="lead">
-          We've given you a pair of programs that work together to
-          accomplish something. Will our programs work correctly?
-          Find an interleaving of executions which makes it not so.
+          In this exercise, we're going to explore basic issues in concurrency and
+          how we can solve them. You'll be given a set of two simple programs, A and B. 
+          For each set, try to find orders of program execution which have different
+          final states.
+        </p>
+        <p>
+          Each program (process) consists of a list of commands, which will execute in list order.
+          However, instructions from different processes can be interleaved and then executed
+          in any order.  You can adjust the interleaving of
+          the two process' instructions by clicking and dragging any instruction
+          into a new location in the execution list. 
         </p>
       </div>
+      <h3>Getting started: Race Conditions</h3>
+      <p>
+        In this example, different interleavings of code result in different final balances in
+        shared memory.  How many different final balances can you find?
+      </p>
       <div data-role="racerpuzzle" data-puzzleset="simpleRace">
+      </div>
+      <hr />
+      <h3>Warming up: Locks</h3>
+      <p>
+        Here, we've added a lock to protect access to the balance variable. The lock ensures that
+        certain interleavings of the two processes are impossible, processes have to wait until
+        a lock is free before proceeding. How many different final balances can you find now?
+        What interleavings are even possible with these processes?
+      </p>
+      <div data-role="racerpuzzle" data-puzzleset="simpleLock">
+      </div>
+      <hr />
+      <h3>Overshooting: Deadlock</h3>
+      <p>
+        So if one lock fixes things, then two should make it doubly so, right?
+        Turns out not so. Take this case, where each process already has one of the locks.
+        Does any solution work?
+      </p>
+      <div data-role="racerpuzzle" data-puzzleset="deadLock">
       </div>
     </div>
   </body>
