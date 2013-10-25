@@ -79,7 +79,7 @@
 
     Process.prototype.reset = function() {
       this.commandLine = 0;
-      return this.memory.reset;
+      return this.memory.reset();
     };
 
     Process.prototype.step = function() {
@@ -259,6 +259,7 @@
   Module.PuzzleSet = PuzzleSet = (function() {
     function PuzzleSet(set) {
       var command, commands, memory, name, process, _ref;
+      this.name = set.name;
       this.shared = new Memory(set.shared);
       this.memories = {
         shared: this.shared
@@ -340,6 +341,49 @@
         this.ordering = puzzleOrOrdering;
       }
     }
+
+    ExecutionOrder.prototype.getIndexFromCommandOrder = function(pos) {
+      var i, index, order, process, _i, _ref;
+      index = 0;
+      process = pos.process;
+      order = pos.order;
+      for (i = _i = _ref = this.ordering.length - 1; _i >= 0; i = _i += -1) {
+        if (this.ordering[i] === process) {
+          order--;
+          if (order === -1) {
+            console.log("index " + i);
+            return i;
+          }
+        }
+      }
+      throw new Error("Could not find index for " + process + " order " + order);
+    };
+
+    ExecutionOrder.prototype.tryCommandMove = function(oldPos, newPos) {
+      var incr, length, newIndex, oldIndex, process, testIndex;
+      process = oldPos.process;
+      oldIndex = this.getIndexFromCommandOrder(oldPos);
+      newIndex = this.getIndexFromCommandOrder(newPos);
+      if (oldIndex === newIndex) {
+        return true;
+      }
+      incr = oldIndex > newIndex ? -1 : 1;
+      length = this.ordering.length;
+      testIndex = oldIndex;
+      while (this.ordering[testIndex] === process) {
+        testIndex += incr;
+        if (testIndex < 0 || testIndex >= length) {
+          return false;
+        }
+      }
+      if (testIndex < 0 || testIndex >= length) {
+        return false;
+      }
+      console.log("swapping " + oldIndex + "," + testIndex);
+      this.ordering[oldIndex] = this.ordering[testIndex];
+      this.ordering[testIndex] = process;
+      return true;
+    };
 
     return ExecutionOrder;
 

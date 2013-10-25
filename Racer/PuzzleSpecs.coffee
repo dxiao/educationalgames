@@ -23,7 +23,9 @@ Module.simpleRace =
         { type: "Increment", variable: "btemp", increment: -7 },
         { type: "Set", local: "btemp", shared: "balance" }
       ]
+###
   finish:
     shared:
       balance: 96
+###
 

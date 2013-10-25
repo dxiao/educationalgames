@@ -44,7 +44,7 @@ Module.Process = class Process
     @reset()
   reset: ->
     @commandLine = 0
-    @memory.reset
+    @memory.reset()
   step: ->
     if @commandLine >= @commands.length
       throw new Error "Process " + @name + " has no more instructions!"
@@ -149,6 +149,7 @@ ParseCommand = (command, process, memories) ->
 # *CONST
 Module.PuzzleSet = class PuzzleSet
   constructor: (set) ->
+    @name = set.name
     @shared = new Memory set.shared
     @memories = {shared: @shared}
     @processes = {}
@@ -175,7 +176,7 @@ Module.PuzzleSet = class PuzzleSet
     errors
 
 # An order in which a puzzle set is executed
-# IMMUTABLE
+# MUTABLE
 Module.ExecutionOrder = class ExecutionOrder
   constructor: (puzzleOrOrdering) ->
     if puzzleOrOrdering instanceof PuzzleSet
@@ -185,4 +186,33 @@ Module.ExecutionOrder = class ExecutionOrder
           @ordering.push name
     else
       @ordering = puzzleOrOrdering
-
+  getIndexFromCommandOrder: (pos) ->
+    index = 0
+    process = pos.process
+    order = pos.order
+    for i in [@ordering.length-1..0] by -1
+      if @ordering[i] == process
+        order--
+        if order == -1
+          console.log "index " + i
+          return i
+    throw new Error "Could not find index for " + process + " order " + order
+  tryCommandMove: (oldPos, newPos) ->
+    process = oldPos.process
+    oldIndex = @getIndexFromCommandOrder oldPos
+    newIndex = @getIndexFromCommandOrder newPos
+    if oldIndex == newIndex
+      return true
+    incr = if oldIndex > newIndex then -1 else 1
+    length = @ordering.length
+    testIndex = oldIndex
+    while @ordering[testIndex] == process
+      testIndex += incr
+      if testIndex < 0 or testIndex >= length
+        return false
+    if testIndex < 0 or testIndex >= length
+      return false
+    console.log "swapping " + oldIndex + "," + testIndex
+    @ordering[oldIndex] = @ordering[testIndex]
+    @ordering[testIndex] = process
+    return true

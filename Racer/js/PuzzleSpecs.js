@@ -49,13 +49,15 @@
           }
         ]
       }
-    },
-    finish: {
-      shared: {
-        balance: 96
-      }
     }
   };
+
+  /*
+    finish:
+      shared:
+        balance: 96
+  */
+
 
 }).call(this);
 
