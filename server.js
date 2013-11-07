@@ -4,17 +4,19 @@ var express = require("express"),
 
 app.use(express.logger());
 app.use(express.bodyParser());
-app.use("/", express.static(__dirname));
+app.use("/racer", express.static(__dirname + "/Racer/"));
+app.use("/regex", express.static(__dirname + "/Regex/"));
+app.use("/common/", express.static(__dirname + "/Common/"));
 
 var buffer = []
 
-app.post("/monitoring", function(req, res) {
+app.post("/Racer/monitoring", function(req, res) {
   buffer.push([req.ip, new Date().toLocaleTimeString(), 
     req.body.puzzle, req.body.ordering, req.body.finalState])
   res.send(200)
 })
 
-app.get("/monitoring", function(req, res) {
+app.get("/Racer/monitoring", function(req, res) {
   res.json(buffer)
   buffer = []
 })

@@ -186,6 +186,7 @@ Module.ExecutionOrder = class ExecutionOrder
           @ordering.push name
     else
       @ordering = puzzleOrOrdering
+
   getIndexFromCommandOrder: (pos) ->
     index = 0
     process = pos.process
@@ -197,6 +198,7 @@ Module.ExecutionOrder = class ExecutionOrder
           console.log "index " + i
           return i
     throw new Error "Could not find index for " + process + " order " + order
+
   tryCommandMove: (oldPos, newPos) ->
     process = oldPos.process
     oldIndex = @getIndexFromCommandOrder oldPos
