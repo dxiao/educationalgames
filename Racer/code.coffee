@@ -1,6 +1,3 @@
-Module = {}
-window.RaceCode = Module
-
 RacerView = window.RacerView
 
 # --------------Ready Function----------------

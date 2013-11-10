@@ -1,10 +1,10 @@
 {
   "version": 3,
   "file": "code.js",
-  "sourceRoot": "..",
+  "sourceRoot": "..\\..",
   "sources": [
-    "code.coffee"
+    "Racer\\code.coffee"
   ],
   "names": [],
-  "mappings": ";AAAA;CAAA,KAAA,WAAA;;CAAA,CAAA,CAAS,GAAT;;CAAA,CACA,CAAkB,GAAZ,EAAN;;CADA,CAGA,CAAY,GAAM,GAAlB;;CAHA,CAOA,CAAE,MAAA;CACA,EAAoC,CAApC,KAAoC,EAApC,gBAAA;CACY,GAAW,KAAZ,CAAT,GAAA;CADF,IAAoC;CADtC,EAAE;CAPF"
+  "mappings": ";AAAA;CAAA,KAAA,GAAA;;CAAA,CAAA,CAAY,GAAM,GAAlB;;CAAA,CAIA,CAAE,MAAA;CACA,EAAoC,CAApC,KAAoC,EAApC,gBAAA;CACY,GAAW,KAAZ,CAAT,GAAA;CADF,IAAoC;CADtC,EAAE;CAJF"
 }
