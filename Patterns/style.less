@@ -1,0 +1,85 @@
+.pad-left {
+  padding-left:1em;
+}
+
+.table-label {
+  margin-top:.5em;
+}
+
+.page-header {
+  p.lead {
+    margin-bottom: 10px;
+  }
+}
+
+[data-role=racerpuzzle] {
+  table {
+    table-layout:fixed;
+
+    th {
+      border-bottom: 1px solid lightGrey
+    }
+
+    tr {
+      margin: .5em;
+    }
+    tr:nth-child(even) {
+      background: #EEE;
+    }
+
+    th:first-child {
+      width:40%;
+    }
+  }
+
+  .code {
+    font-family: monospace;
+  }
+
+  .alignedCode {
+    .code;
+    
+    .process0 {
+      padding-left: 0em;
+    }
+    .process1 {
+      padding-left: 5em;
+    }
+    .process2 {
+      padding-left: 10em;
+    }
+  }
+
+  .codeDesc {
+    .code;
+    .indentleft;
+  }
+
+  .indentleft {
+    padding-left: 5em;
+  }
+
+  .process0 {
+    color: DarkRed
+  }
+
+  .process1 {
+    color: DarkBlue
+  }
+
+  .process2 {
+    color: DarkGreen
+  }
+
+  .puzzleTable {
+    width: 100%
+  }
+
+  .dragHandle {
+    cursor: n-resize;
+
+    .glyphicon {
+      float: left;
+    }
+  }
+}
