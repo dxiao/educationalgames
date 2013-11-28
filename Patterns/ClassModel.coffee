@@ -32,6 +32,10 @@ class Field extends ModelObject
   constructor: (name, modifiers, @type) ->
     super name, modifiers
 
+class ModelEdge
+  constructor: (@from, @to) ->
+
+
 # Type with no methods
 class Struct extends Type
   constructor: (name, modifiers, @parents, @fields) ->
