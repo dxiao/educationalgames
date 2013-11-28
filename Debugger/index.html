@@ -12,12 +12,14 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/common/js/bootstrap.min.js"></script>
     <!-- Less -->
-    <link href="/debugger/style.less" rel="stylesheet/less" type="text/css" />
+    <link href="/debugger/less/style.less" rel="stylesheet/less" type="text/css" />
     <script src="/common/js/less.min.js"></script>
     <!-- Angular -->
     <script src="/common/js/angular.min.js"></script>
 
-    <script src="/debugger/js/init.js"></script>
+    <script src="/debugger/js/utils.js"></script>
+    <script src="/debugger/js/DebuggerModel.js"></script>
+    <script src="/debugger/js/DebuggerEngine.js"></script>
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -33,6 +35,16 @@
           Back in the golden age of punch card computers, a young ben bitdiddle found himself
           one sad night debugging a principal machine whose program had developed a bug. 
         </p>
+      </div>
+      <div ng-app="debugger" debugger-problem="problem.js">
+        <div ng-controller="ProgramViewer">
+          <div ng-repeat="line in program.lines">
+            <div class="debugger-line">
+              {{line.toString()}}
+            </div>
+          </div>
+        </div>
+        {{debuggerProblem}}
       </div>
     </div>
   </body>

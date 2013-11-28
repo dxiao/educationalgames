@@ -1,8 +1,6 @@
-ClassView = window.ClassView
+ProgramModel = window.ProgramModel
 
 # --------------Ready Function----------------
 
 $ ->
-  $("[data-role='classmodel']").each ->
-    ClassView.initView $ this
 
