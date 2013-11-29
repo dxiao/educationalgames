@@ -10,28 +10,42 @@
 
   Model = window.DebuggerModel;
 
-  Module.ProgramViewer = function($scope) {
-    return $scope.program = new Model.ProgramView(20);
-  };
+  Module.ProgramViewer = function($scope) {};
 
-  Module.ProgramControl = function($scope, $server) {
-    return $scope.getLines = function(linestart) {
-      return $server.getProblemLines($scope.debuggerProblem);
+  Module.ProgramControl = function($scope, server) {
+    return $scope.getLines = function(lineStart) {
+      return server.getProblemLines($scope.problemId, lineStart, $scope.program);
     };
   };
 
   Module.Server = ServerService = (function() {
-    function ServerService(http) {
+    function ServerService(http, location) {
       this.http = http;
+      this.location = location;
     }
 
-    ServerService.prototype.getProblemLines = function(problem, line) {
-      return this.http.get({
-        url: "/getsource",
-        data: {
-          problem: problem,
+    ServerService.prototype.getProblemId = function() {
+      return this.location.absUrl().split("/").slice(-1)[0];
+    };
+
+    ServerService.prototype.getProblemLines = function(problem, line, view) {
+      var query;
+      query = this.http.get("/debugger/getsource", {
+        params: {
+          problemId: problem,
           line: line
         }
+      });
+      return query.success(function(data) {
+        return view.setLines((function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = data.length; _i < _len; _i++) {
+            line = data[_i];
+            _results.push(Model.Line.fromJson(line));
+          }
+          return _results;
+        })());
       });
     };
 
@@ -46,9 +60,14 @@
     }
   };
 
-  Module.DebuggerEngine = angular.module('debugger', []).controller("ProgramViewer", Module.ProgramViewer).controller("ProgramControl", ["ServerService", Module.ProgramControl]).directive("debuggerProblem", function() {
+  Module.DebuggerEngine = angular.module('debugger', []).controller("ProgramViewer", Module.ProgramViewer).controller("ProgramControl", ["$scope", "ServerService", Module.ProgramControl]).directive("debuggerProblem", function() {
     return Module.DebuggerProblem;
-  }).service("ServerService", ["$http", ServerService]);
+  }).service("ServerService", ["$http", "$location", ServerService]).run([
+    "$rootScope", "ServerService", function(scope, server) {
+      scope.problemId = server.getProblemId();
+      return scope.program = new Model.ProgramView(20);
+    }
+  ]);
 
 }).call(this);
 

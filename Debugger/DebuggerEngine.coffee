@@ -7,22 +7,26 @@ Model = window.DebuggerModel
 # ---------------- Controllers --------------
 
 Module.ProgramViewer = ($scope) ->
-  $scope.program = new Model.ProgramView(20)
     
-Module.ProgramControl = ($scope, $server) ->
-  $scope.getLines = (linestart) ->
-    $server.getProblemLines $scope.debuggerProblem
+Module.ProgramControl = ($scope, server) ->
+  $scope.getLines = (lineStart) ->
+    server.getProblemLines $scope.problemId, lineStart, $scope.program
 
 # ---------------- Services -----------------
 
 Module.Server = class ServerService
-  constructor: (@http) ->
-  getProblemLines: (problem, line) ->
-    @http.get
-      url: "/getsource"
-      data:
-        problem: problem
+  constructor: (@http, @location) ->
+
+  getProblemId: () ->
+    @location.absUrl().split("/").slice(-1)[0]
+
+  getProblemLines: (problem, line, view) ->
+    query = @http.get "/debugger/getsource",
+      params:
+        problemId: problem
         line: line
+    query.success (data) ->
+      view.setLines (Model.Line.fromJson line for line in data)
 
 # ---------------- Directives ---------------
 
@@ -35,6 +39,9 @@ Module.DebuggerProblem =
 
 Module.DebuggerEngine = angular.module('debugger', [])
   .controller("ProgramViewer", Module.ProgramViewer)
-  .controller("ProgramControl", ["ServerService", Module.ProgramControl])
+  .controller("ProgramControl", ["$scope", "ServerService", Module.ProgramControl])
   .directive("debuggerProblem", () -> return Module.DebuggerProblem)
-  .service("ServerService", ["$http", ServerService])
+  .service("ServerService", ["$http", "$location", ServerService])
+  .run(["$rootScope", "ServerService", (scope, server) ->
+    scope.problemId = server.getProblemId()
+    scope.program = new Model.ProgramView(20)])

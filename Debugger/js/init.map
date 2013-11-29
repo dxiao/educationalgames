@@ -1,9 +1,9 @@
 {
   "version": 3,
   "file": "init.js",
-  "sourceRoot": "..",
+  "sourceRoot": "..\\..",
   "sources": [
-    "init.coffee"
+    "Debugger\\init.coffee"
   ],
   "names": [],
   "mappings": ";AAAA;CAAA,KAAA,MAAA;;CAAA,CAAA,CAAe,GAAM,MAArB;;CAAA,CAIA,CAAE,MAAA;CAJF"

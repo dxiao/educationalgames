@@ -37,7 +37,11 @@ class ProblemsManager
     @instances = {}
 
   hasInstance: (id) ->
-    return @instances[id]?
+    if @instances[id]?
+      @resetTimer id
+      return true
+    else
+      return false
 
   newInstance: (name) ->
     instance = new ProblemInstance @templates[name]
@@ -69,6 +73,7 @@ Module.useExpressServer = (app) ->
   app.use "/debugger/js", express.static(__dirname + "/js")
   app.use "/debugger/less", express.static(__dirname + "/less")
   app.use "/debugger/images", express.static(__dirname + "/images")
+  app.use "/debugger/", express.static(__dirname)
 
   app.get "/debugger/problem/:problem", (req, res) ->
     problem = req.params.problem
@@ -79,18 +84,13 @@ Module.useExpressServer = (app) ->
     unless instance? then return res.send 400, "Problem not found"
     res.redirect "/debugger/problem/" + instance.id
 
-  app.get "/debugger/newproblem", (req, res) ->
-    unless req.query.problem? then return res.send 400, "No parameter problem found"
-    instance = problemsManager.newInstance req.query.problem
-    res.send 200, instance.id
-
-  app.get "/debugger/:problemid/getinfo", (req, res) ->
-    instance = problemsManager.getInstance req.params.problemid
+  app.get "/debugger/getinfo", (req, res) ->
+    instance = problemsManager.getInstance req.query.problemId
     unless instance? then return res.send 400, "Problem not found"
     res.json 200, {name: instance.template.name}
 
-  app.get "/debugger/:problemid/getsource", (req, res) ->
-    instance = problemsManager.getInstance req.params.problemid
+  app.get "/debugger/getsource", (req, res) ->
+    instance = problemsManager.getInstance req.query.problemId
     unless instance? then return res.send 400, "Problem not found"
     line = parseInt req.query.line
     unless line? then return res.send 400, "Line argument not found"

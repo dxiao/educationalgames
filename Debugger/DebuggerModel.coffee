@@ -31,14 +31,14 @@ Module.EmptyLineBlock = class EmptyLineBlock extends Line
   isNum: (num) ->
     return @num <= num < @endnum
 
-  splitAroundOn: (line) ->
+  splitOn: (line) ->
     _.assert @isNum(line.num), "Split must get line between " + @num + "-" + @endnum
     ret = [line]
     num = line.num
     if num+1 < @endnum
-      ret.append new EmptyLineBlock @num+1, @endnum
+      ret.push new EmptyLineBlock @num+1, @endnum
     if @num < num
-      ret.append new EmptyLineBlock @num, num
+      ret.push new EmptyLineBlock @num, num
     return ret
 
   toString: ->
@@ -70,15 +70,15 @@ Module.ProgramView = class ProgramView
   setLine: (line) ->
     _.assert line.num < @numLines, "Line number specified is out of program bounds"
     num = line.num
-    index = @getLine num
+    index = @findLine num
     if index == -1
-      @lines.append line
+      @lines.push line
     curLine = @lines[index]
     if curLine instanceof EmptyLineBlock
-      @lines[index..index] = curLine.splitAround line
+      @lines[index..index] = curLine.splitOn line
     else
       @lines[index] = line
       
   setLines: (lines) ->
     for line in lines
-      @setline line
+      @setLine line

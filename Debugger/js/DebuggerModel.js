@@ -58,16 +58,16 @@
       return (this.num <= num && num < this.endnum);
     };
 
-    EmptyLineBlock.prototype.splitAroundOn = function(line) {
+    EmptyLineBlock.prototype.splitOn = function(line) {
       var num, ret;
       _.assert(this.isNum(line.num), "Split must get line between " + this.num + "-" + this.endnum);
       ret = [line];
       num = line.num;
       if (num + 1 < this.endnum) {
-        ret.append(new EmptyLineBlock(this.num + 1, this.endnum));
+        ret.push(new EmptyLineBlock(this.num + 1, this.endnum));
       }
       if (this.num < num) {
-        ret.append(new EmptyLineBlock(this.num, num));
+        ret.push(new EmptyLineBlock(this.num, num));
       }
       return ret;
     };
@@ -126,13 +126,13 @@
       var curLine, index, num, _ref;
       _.assert(line.num < this.numLines, "Line number specified is out of program bounds");
       num = line.num;
-      index = this.getLine(num);
+      index = this.findLine(num);
       if (index === -1) {
-        this.lines.append(line);
+        this.lines.push(line);
       }
       curLine = this.lines[index];
       if (curLine instanceof EmptyLineBlock) {
-        return ([].splice.apply(this.lines, [index, index - index + 1].concat(_ref = curLine.splitAround(line))), _ref);
+        return ([].splice.apply(this.lines, [index, index - index + 1].concat(_ref = curLine.splitOn(line))), _ref);
       } else {
         return this.lines[index] = line;
       }
@@ -143,7 +143,7 @@
       _results = [];
       for (_i = 0, _len = lines.length; _i < _len; _i++) {
         line = lines[_i];
-        _results.push(this.setline(line));
+        _results.push(this.setLine(line));
       }
       return _results;
     };

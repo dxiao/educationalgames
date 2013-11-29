@@ -33,18 +33,16 @@
         <h1>Punchcard Debugging!</h1>
         <p>
           Back in the golden age of punch card computers, a young ben bitdiddle found himself
-          one sad night debugging a principal machine whose program had developed a bug. 
+          one sad night debugging a machine whose program had developed a bug...
         </p>
       </div>
-      <div ng-app="debugger" debugger-problem="problem.js">
+      <div ng-app="debugger">
         <div ng-controller="ProgramViewer">
-          <div ng-repeat="line in program.lines">
-            <div class="debugger-line">
-              {{line.toString()}}
-            </div>
-          </div>
+          <pre><code><div ng-repeat="line in program.lines">{{line.toString()}}</div></code></pre>
         </div>
-        {{debuggerProblem}}
+        <div ng-controller="ProgramControl">
+          <button ng-click="getLines(0)">Get first lines!</button>
+        </div>
       </div>
     </div>
   </body>
