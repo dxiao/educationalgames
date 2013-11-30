@@ -72,6 +72,6 @@ SubsequenceSearch.prototype = {
   }
 }
 // Class SubsequenceSearch static methods
-SubsequenceSearch.findLongestSubsequence = function (strings) {
+SubsequenceSearch.findLongest = function (strings) {
   return new SubsequenceSearch(strings).extendSearch();
 }

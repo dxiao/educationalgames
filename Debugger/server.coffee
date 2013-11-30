@@ -14,12 +14,20 @@ idCounter = 0
 problemNames = ["problem"]
 
 getProgramLinesFromFile = (fileName) ->
-  return (new Model.Line(line, i) for line, i in \
+  (new Model.Line(line, i) for line, i in \
     fs.readFileSync(__dirname + "/" + fileName, {encoding: "utf8"}).split("\n"))
+
+getJsonFromFile = (fileName) ->
+  JSON.parse fs.readFileSync __dirname + "/" + fileName, {encoding: "utf8"}
   
 class ProblemTemplate
-  constructor: (@name) ->
-    @program = getProgramLinesFromFile(@name + ".js")
+  constructor: (file) ->
+    data = getJsonFromFile file
+    @program = getProgramLinesFromFile data.programFile
+    @description = data.description.join "\n"
+    @language = data.language
+    @outline = data.outline
+    @tests = data.tests
 
 class ProblemInstance
   constructor: (@template) ->

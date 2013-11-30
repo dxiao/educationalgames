@@ -38,7 +38,7 @@
       </div>
       <div ng-app="debugger">
         <div ng-controller="ProgramViewer">
-          <pre><code><div ng-repeat="line in program.lines">{{line.toString()}}</div></code></pre>
+          <pre class="page-bubble"><code><div ng-repeat="line in program.lines">{{line.toString()}}</div></code></pre>
         </div>
         <div ng-controller="ProgramControl">
           <button ng-click="getLines(0)">Get first lines!</button>

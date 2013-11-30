@@ -1,0 +1,28 @@
+{
+  name: "problem",
+  language: "javascript",
+  programFile: "problem.js",
+  description: [
+    "Ben's machine is tasked with finding the longest sequence of characters common to a list of strings given as input to the machine. For example:",
+    "",
+    "  > SubsequenceSearch.findLongest('happy', 'sappy', 'hooray');",
+    "",
+    "Should return the string 'ay' as a result. However, it seems something is wrong: His program currently outputs '' instead. See if you can identify the buggy line of code, and fix it!"
+  ],
+  tests: [
+    {
+      input: "SubsequenceSearch.findLongest('happy', 'sappy', 'hooray');"
+      output: "ay"
+    }
+  ],
+  programOutline: [
+    {line:  0, text: "class Sequence:"},
+    {line: 11, text: "  .findLetterAfter()"
+    {line: 18, text: "  .addLetter()"},
+    {line: 21, text: "  .toString()"},
+    {line: 28, text: "class SubSequence"},
+    {line: 41, text: "  .tryAddLetter()"},
+    {line: 57, text: "  .extendSearch()"},
+    {line: 75, text: "SubsequenceSearch.findLongest()"}
+  ]
+}
