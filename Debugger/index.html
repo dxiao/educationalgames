@@ -37,10 +37,15 @@
         </p>
       </div>
       <div ng-app="debugger">
+        <div ng-controller="ProgramInfo">
+          {{programInfo}}
+        </div>
         <div ng-controller="ProgramViewer">
           <pre class="page-bubble"><code><div ng-repeat="line in program.lines">{{line.toString()}}</div></code></pre>
         </div>
-        <div ng-controller="ProgramControl">
+        <div ng-controller="ProgramTests">
+        </div>
+        <div class="page-bubble" ng-controller="ProgramControl">
           <button ng-click="getLines(0)">Get first lines!</button>
         </div>
       </div>
