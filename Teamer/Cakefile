@@ -1,0 +1,41 @@
+# Cake for compiling the public javascript files
+
+# -------------------------------------------------------
+# Helpers adapted from the coffee-script project Cakefile
+
+{spawn, exec} = require 'child_process'
+
+# ANSI Terminal Colors.
+bold = red = green = reset = ''
+unless process.env.NODE_DISABLE_COLORS
+  bold  = '\x1B[0;1m'
+  red   = '\x1B[0;31m'
+  green = '\x1B[0;32m'
+  reset = '\x1B[0m'
+
+# Log a message with a color.
+log = (message, color, explanation) ->
+  console.log (color or '') + message + reset + ' ' + (explanation or '')
+
+# Build the CoffeeScript language from source.
+build = (files, cb) ->
+  run ['-c', '-m', '-o', 'js'].concat(files), cb
+
+compiler = if process.platform == 'win32' then 'coffee.cmd' else 'coffee'
+
+# Run a CoffeeScript through our node/coffee interpreter.
+run = (args, cb) ->
+  proc =         spawn compiler, args
+  proc.stderr.on 'data', (buffer) -> console.log '> ' + buffer.toString()
+  proc.on        'exit', (status) ->
+    process.exit(1) if status != 0
+    cb() if typeof cb is 'function'
+  proc.on        'error', (args...) -> console.log args
+
+# ---------------------------------------------------
+
+public_files = ['./TeamerModel.coffee', './utils.coffee']
+
+task 'build', 'compile coffeescript into public javascript files', (options) ->
+  build public_files
+  log 'Done!', green
