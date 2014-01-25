@@ -41,7 +41,7 @@ class ProblemsManager
   constructor: (@problemNames) ->
     @templates = {}
     for name in @problemNames
-      @templates[name] = new ProblemTemplate name
+      @templates[name] = new ProblemTemplate name + ".data.json"
     @instances = {}
 
   hasInstance: (id) ->
