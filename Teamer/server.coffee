@@ -21,17 +21,37 @@ Model = require "./TeamerModel.coffee"
 #   All Stages
 # getProblems():string[]
 # getProblemInfo(problem):problemInfo
+# //get the state of the implementation
 # getProblemStatus(problem):problemStatus
-#   Stage 1:
+# //Stage 1:
 # submitFunction(token, function, impl)
-#   Stage 2:
+# //Stage 2:
 # getImplementations(token, problem)
 # 
 
 # ------------- Model ----------------
 
 problems = {}
-problems.suite = require "./problems/sql.coffee"
+problems.sql = require "./problems/sql.coffee"
+
+class PlayerRegistry
+  constructor: () ->
+    @players = {}
+  getNextUnusedId: () ->
+    loop
+      newId = Math.floor Math.random()*1000000
+      unless newId in @players
+        return newId
+  createNewPlayer: (name) ->
+    for id, player of @players
+      if player.name == name
+        return false
+    newId = @getNextUnusedId()
+    newPlayer = new Model.Player newId, name
+    @players[newId] = newPlayer
+    return newId
+
+playerRegistry = new PlayerRegistry()
 
 # ------------- Server ---------------
 
@@ -41,7 +61,21 @@ Module.useExpressServer = (app) ->
   app.use "/teamer/images", express.static(__dirname + "/images")
 
   app.get "/teamer", (req, res) ->
-    res.render 'index.html', (err, html) ->
-      console.log err
+    res.sendfile __dirname + "/index.html"
 
+  app.get "/teamerapi/getProblems", (req, res) ->
+    res.json Object.keys problems
+  app.get "/teamerapi/problem/:problem/start", (req, res) ->
+    
+  app.get "/teamerapi/problem/:problem/getFunctions", (req, res) ->
+  app.get "/teamerapi/login", (req, res) ->
+    name = req.query.name
+    id = playerRegistry.createNewPlayer name
+    if id
+      console.log id + "!!!!!!!!!!"
+      res.send 200, id + ""
+    else
+      console.log id + "??????????"
+      res.send 409, "User name " + name + " already taken, please try another."
 
+console.log Object.keys(problems)

@@ -1,32 +1,31 @@
 Module = {}
 if module? and module.exports?
   module.exports = Module
-  _ = require "./Utils.coffee"
+  _ = require "./utils.coffee"
 else
   window.DebuggerModel = Module
   _ = window.Utils
 
+# Problem Description
 
-Module.Problem = class Problem
-  constructor: (@name, @description) ->
+Module.Function = class Function
+  constructor: (@name, @family, @description) ->
+    @phase = family.phase
 
-Module.TestableProblem = class TestableProblem extends Problem
-  constructor: (@name, @descrption, @tester) ->
-
-Module.ProblemFamily = class ProblemFamily
-  constructor: (@name, @phase, @description, @problems = {}) ->
-  addProblems: (problems...) ->
-    for problem in problems
-      @problems[problem.name] = problem
+Module.FunctionFamily = class FunctionFamily
+  constructor: (@name, @phase, @description) ->
 
 Module.ProblemSuite = class ProblemSuite
-  constructor: (@name, @families = {}) ->
-  addFamilies: (families...) ->
-    for family in families
-      @problems[family.name] = family
+  constructor: (@name, @functions = {}) ->
+    @functions = {}
+  addFunctions: (functions...) ->
+    for func in functions
+      @functions[func.name] = func
+
+# Problem Submissions
 
 Module.Implementation = class Implementation
-  constructor: (@user, @problem, @dependencies = []) ->
+  constructor: (@function, @user, @code) ->
 
 Module.ProblemRound = class ProblemRound
   constructor: (@problem, @id) ->
@@ -36,6 +35,16 @@ Module.ProblemRound = class ProblemRound
       @players[player.name] = player
     else
       throw new Error "Player already added to round!"
+
+# Problem State
+
+Module.ProblemState = class ProblemState
+  constructor: (@problem, @starttime) ->
+    @implementations = {} # problem -> implementation
+    @feedback = {} # implementation -> feedback
+  addImplementation: (implementation) ->
+    
+# User Information
 
 Module.Player = class Player
   constructor: (@id, @name) ->
