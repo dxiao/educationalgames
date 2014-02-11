@@ -59,6 +59,7 @@ Module.useExpressServer = (app) ->
   app.use "/teamer/js", express.static(__dirname + "/js")
   app.use "/teamer/less", express.static(__dirname + "/less")
   app.use "/teamer/images", express.static(__dirname + "/images")
+  app.use "/teamer/views", express.static(__dirname + "/views")
 
   app.get "/teamer", (req, res) ->
     res.sendfile __dirname + "/index.html"
@@ -77,5 +78,3 @@ Module.useExpressServer = (app) ->
     else
       console.log id + "??????????"
       res.send 409, "User name " + name + " already taken, please try another."
-
-console.log Object.keys(problems)

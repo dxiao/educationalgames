@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="teamer">
   <head>
     <title>Team Programming!</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link href="/common/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="/common/js/jquery-2.1.0.min.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
     <link href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet">
     <!-- Include all compiled plugins (below), or include individual files as needed -->
@@ -16,9 +16,11 @@
     <script src="/common/js/less.min.js"></script>
     <!-- Angular -->
     <script src="/common/js/angular.min.js"></script>
+    <script src="/common/js/angular-route.min.js"></script>
 
     <script src="/teamer/js/utils.js"></script>
     <script src="/teamer/js/TeamerModel.js"></script>
+    <script src="/teamer/js/app.js"></script>
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -27,26 +29,7 @@
     <![endif]-->
   </head>
   <body>
-    <div class="container">
-      <div class="page-header">
-        <h1>Team Programming!</h1>
-        <p>
-        Information about the current round and such.
-        </p>
-      </div>
-      <div ng-app="debugger">
-        <div ng-controller="ProgramInfo">
-          {{programInfo}}
-        </div>
-        <div ng-controller="ProgramViewer">
-          <pre class="page-bubble"><code><div ng-repeat="line in program.lines">{{line.toString()}}</div></code></pre>
-        </div>
-        <div ng-controller="ProgramTests">
-        </div>
-        <div class="page-bubble" ng-controller="ProgramControl">
-          <button ng-click="getLines(0)">Get first lines!</button>
-        </div>
-      </div>
-    </div>
+    Hello!
+    <div ng-view></div>
   </body>
 </html>

@@ -34,7 +34,7 @@ run = (args, cb) ->
 
 # ---------------------------------------------------
 
-public_files = ['./TeamerModel.coffee', './utils.coffee']
+public_files = ['./TeamerModel.coffee', './utils.coffee', './app.coffee']
 
 task 'build', 'compile coffeescript into public javascript files', (options) ->
   build public_files
