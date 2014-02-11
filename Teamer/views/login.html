@@ -1,1 +1,14 @@
-This is the login page. {{ user }}
+<div class="container">
+  <div class="jumbotron">
+    <h1>Welcome!</h1>
+    <p>Before we begin, what is your name?</p>
+    <form ng-submit="submitName()">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Alyssa P. Hacker" ng-model="loginname"></input>
+        <span class="input-group-btn">
+          <button class="btn btn-info" type="submit">Start!</button>
+        </span>
+      </div>
+    </form>
+  </div>
+</div>
