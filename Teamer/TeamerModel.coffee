@@ -3,7 +3,7 @@ if module? and module.exports?
   module.exports = Module
   _ = require "./utils.coffee"
 else
-  window.DebuggerModel = Module
+  window.TeamerModel = Module
   _ = window.Utils
 
 # Problem Description

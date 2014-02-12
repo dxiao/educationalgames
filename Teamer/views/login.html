@@ -9,6 +9,9 @@
           <button class="btn btn-info" type="submit">Start!</button>
         </span>
       </div>
+      <div ng-show="loginError" class="alert alert-danger">
+        {{ loginError }}
+      </div>
     </form>
   </div>
 </div>
