@@ -21,6 +21,24 @@ class PlayerAuth
   _setPlayer: (id, name) ->
     @player = new Model.Player id, name
 
+class ProblemServer
+  @$inject = ['$http', '$location', 'playerAuth']
+
+  constructor: ($http, $location, playerAuth) ->
+    @http = $http
+    @player = playerAuth.player
+    @problem = $location.path().split("/")[2]
+
+  getFunctions: (callback) ->
+    @http {
+      method: 'GET'
+      url: '/teamerapi/problem/' + @problem + '/getFunctions'
+      params: {id: @player.id}
+    }
+    .success (data, status) =>
+      callback data, null
+    .error (data, status) ->
+      callback null, data
 
 angular.module 'teamer', ['ngRoute']
   .config ($routeProvider, $locationProvider) ->
@@ -60,9 +78,11 @@ angular.module 'teamer', ['ngRoute']
       $location.path "/login"
   ]
 
-  .controller 'ProblemController', ['$scope', '$location', 'playerAuth',
-  ($scope, $location, playerAuth) ->
-    $scope.player = playerAuth.player
+  .controller 'ProblemController', ['$scope', '$location', 'problemServer',
+  ($scope, $location, server) ->
+    server.getFunctions (data, error) ->
+      $scope.problems = data
   ]
 
   .service 'playerAuth', PlayerAuth
+  .service 'problemServer', ProblemServer

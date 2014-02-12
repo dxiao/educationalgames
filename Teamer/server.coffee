@@ -32,7 +32,7 @@ Model = require "./TeamerModel.coffee"
 # ------------- Model ----------------
 
 problems = {}
-problems.sql = require "./problems/sql.coffee"
+problems.sql = require("./problems/sql.coffee").suite
 
 class PlayerRegistry
   constructor: () ->
@@ -69,6 +69,7 @@ Module.useExpressServer = (app) ->
   app.get "/teamerapi/problem/:problem/start", (req, res) ->
     
   app.get "/teamerapi/problem/:problem/getFunctions", (req, res) ->
+    res.json problems[req.params.problem].functions
   app.get "/teamerapi/login", (req, res) ->
     name = req.query.name
     id = playerRegistry.createNewPlayer name
