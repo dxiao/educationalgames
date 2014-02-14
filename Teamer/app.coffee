@@ -58,10 +58,9 @@ angular.module 'teamer', ['ngRoute']
 
   .controller 'LoginController', ['$scope', '$location', 'playerAuth',
   ($scope, $location, playerAuth) ->
-    $scope.user = 'blah'
     $scope.submitName = () ->
       $scope.loginError = false
-      $scope.id = playerAuth.submitLogin name, (player, error) ->
+      $scope.id = playerAuth.submitLogin $scope.loginname, (player, error) ->
         if player
           $location.path("")
         else
@@ -80,8 +79,10 @@ angular.module 'teamer', ['ngRoute']
 
   .controller 'ProblemController', ['$scope', '$location', 'problemServer',
   ($scope, $location, server) ->
+    $scope.ProblemStage = "Stage 1"
+    $scope.ProblemName = server.problem
     server.getFunctions (data, error) ->
-      $scope.problems = data
+      $scope.functions = data
   ]
 
   .service 'playerAuth', PlayerAuth

@@ -78,10 +78,9 @@
     });
   }).controller('LoginController', [
     '$scope', '$location', 'playerAuth', function($scope, $location, playerAuth) {
-      $scope.user = 'blah';
       return $scope.submitName = function() {
         $scope.loginError = false;
-        return $scope.id = playerAuth.submitLogin(name, function(player, error) {
+        return $scope.id = playerAuth.submitLogin($scope.loginname, function(player, error) {
           if (player) {
             return $location.path("");
           } else {
@@ -102,9 +101,10 @@
     }
   ]).controller('ProblemController', [
     '$scope', '$location', 'problemServer', function($scope, $location, server) {
+      $scope.ProblemStage = "Stage 1";
+      $scope.ProblemName = server.problem;
       return server.getFunctions(function(data, error) {
-        console.log(data);
-        return $scope.problems = data;
+        return $scope.functions = data;
       });
     }
   ]).service('playerAuth', PlayerAuth).service('problemServer', ProblemServer);
