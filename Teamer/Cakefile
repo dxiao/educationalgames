@@ -20,6 +20,8 @@ log = (message, color, explanation) ->
 # Build the CoffeeScript language from source.
 build = (files, cb) ->
   run ['-c', '-m', '-o', 'js'].concat(files), cb
+watch = (files, cb) ->
+  run ['-c', '-m', '-w', '-o', 'js'].concat(files), cb
 
 compiler = if process.platform == 'win32' then 'coffee.cmd' else 'coffee'
 
@@ -38,4 +40,8 @@ public_files = ['./TeamerModel.coffee', './utils.coffee', './app.coffee']
 
 task 'build', 'compile coffeescript into public javascript files', (options) ->
   build public_files
+  log 'Done!', green
+
+task 'watch', 'watch and compile public coffeescript files', (options) ->
+  watch public_files
   log 'Done!', green

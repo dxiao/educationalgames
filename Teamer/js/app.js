@@ -5,10 +5,11 @@
   Model = window.TeamerModel;
 
   PlayerAuth = (function() {
-    PlayerAuth.$inject = ['$http'];
+    PlayerAuth.$inject = ['$http', '$location'];
 
-    function PlayerAuth($http) {
+    function PlayerAuth($http, $location) {
       this.http = $http;
+      this.location = $location;
     }
 
     PlayerAuth.prototype.submitLogin = function(name, callback) {
@@ -20,7 +21,7 @@
         }
       }).success((function(_this) {
         return function(data, status) {
-          _this._setPlayer(data, name);
+          _this.player = new Model.Player(data, name);
           return callback(_this.player, null);
         };
       })(this)).error(function(data, status) {
@@ -28,8 +29,14 @@
       });
     };
 
-    PlayerAuth.prototype._setPlayer = function(id, name) {
-      return this.player = new Model.Player(id, name);
+    PlayerAuth.prototype.assertLoggedIn = function() {
+      if (this.player == null) {
+        console.log("AUTH: no player found, redirecting to login");
+        this.location.path("/login");
+        return false;
+      } else {
+        return this.player;
+      }
     };
 
     return PlayerAuth;
@@ -40,17 +47,19 @@
     ProblemServer.$inject = ['$http', '$location', 'playerAuth'];
 
     function ProblemServer($http, $location, playerAuth) {
+      this.playerAuth = playerAuth;
       this.http = $http;
-      this.player = playerAuth.player;
-      this.problem = $location.path().split("/")[2];
+      this.getProblem = function() {
+        return $location.path().split("/")[2];
+      };
     }
 
     ProblemServer.prototype.getFunctions = function(callback) {
       return this.http({
         method: 'GET',
-        url: '/teamerapi/problem/' + this.problem + '/getFunctions',
+        url: '/teamerapi/problem/' + this.getProblem() + '/getFunctions',
         params: {
-          id: this.player.id
+          id: this.playerAuth.player.id
         }
       }).success((function(_this) {
         return function(data, status) {
@@ -91,18 +100,18 @@
     }
   ]).controller('InitController', [
     '$location', 'playerAuth', function($location, playerAuth) {
-      if (playerAuth.player) {
+      if (playerAuth.assertLoggedIn()) {
         console.log("INIT: player detected, redirecting to problem");
         return $location.path("/problem/sql/phase1");
-      } else {
-        console.log("INIT: no player found, redirecting to login");
-        return $location.path("/login");
       }
     }
   ]).controller('ProblemController', [
-    '$scope', '$location', 'problemServer', function($scope, $location, server) {
+    '$scope', 'playerAuth', 'problemServer', function($scope, playerAuth, server) {
+      if (!playerAuth.assertLoggedIn()) {
+        return;
+      }
       $scope.ProblemStage = "Stage 1";
-      $scope.ProblemName = server.problem;
+      $scope.ProblemName = server.getProblem();
       return server.getFunctions(function(data, error) {
         return $scope.functions = data;
       });
