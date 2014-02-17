@@ -9,7 +9,8 @@ else
 # Problem Description
 
 Module.Function = class Function
-  constructor: (@name, @family, @description) ->
+  constructor: (@name, family, @description) ->
+    @family = family.name
     @phase = family.phase
 
 Module.FunctionFamily = class FunctionFamily
@@ -18,9 +19,13 @@ Module.FunctionFamily = class FunctionFamily
 Module.ProblemSuite = class ProblemSuite
   constructor: (@name, @functions = {}) ->
     @functions = {}
+    @families = {}
   addFunctions: (functions...) ->
     for func in functions
       @functions[func.name] = func
+  addFamilies: (families...) ->
+    for fam in families
+      @families[fam.name] = fam
 
 # Problem Submissions
 
@@ -43,8 +48,27 @@ Module.ProblemState = class ProblemState
     @implementations = {} # problem -> implementation
     @feedback = {} # implementation -> feedback
   addImplementation: (implementation) ->
+
+Module.GameInfo = class GameInfo
+  constructor: (@gameName, @gameStatus, @families) ->
+  @fromJson: (json) ->
+    return new GameInfo json.gameName, GameStatus.fromJson(json.gameStage),
+      json.families
+
+Module.GameStatus = class GameStatus
+  constructor: (@gameStage, @timeRemaining) ->
+  @fromJson: (json) ->
+    return new GameStatus json.gameStage, json.timeRemaining
     
 # User Information
 
 Module.Player = class Player
   constructor: (@id, @name) ->
+
+Module.PlayerView = class PlayerView
+  constructor: (@player, @functions) ->
+    @impl = {}
+  addImplementation: (impl) ->
+  toJson: () ->
+  @fromJson: (json) ->
+

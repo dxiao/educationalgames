@@ -49,17 +49,22 @@
     function ProblemServer($http, $location, playerAuth) {
       this.playerAuth = playerAuth;
       this.http = $http;
-      this.getProblem = function() {
-        return $location.path().split("/")[2];
-      };
+      this.location = $location;
     }
 
+    ProblemServer.prototype.updateConfig = function() {
+      var _ref;
+      this.problem = this.location.path().split("/")[2];
+      return this.id = (_ref = this.playerAuth.player) != null ? _ref.id : void 0;
+    };
+
     ProblemServer.prototype.getFunctions = function(callback) {
+      this.updateConfig();
       return this.http({
         method: 'GET',
-        url: '/teamerapi/problem/' + this.getProblem() + '/getFunctions',
+        url: '/teamerapi/problem/' + this.problem + '/getFunctions',
         params: {
-          id: this.playerAuth.player.id
+          id: this.id
         }
       }).success((function(_this) {
         return function(data, status) {
@@ -67,6 +72,16 @@
         };
       })(this)).error(function(data, status) {
         return callback(null, data);
+      });
+    };
+
+    ProblemServer.prototype.joinGame = function() {
+      return this.http({
+        method: 'GET',
+        url: '/teamerapi/game/' + this.problem + '/joinGame',
+        params: {
+          id: this.id
+        }
       });
     };
 
@@ -111,9 +126,14 @@
         return;
       }
       $scope.ProblemStage = "Stage 1";
-      $scope.ProblemName = server.getProblem();
-      return server.getFunctions(function(data, error) {
+      $scope.ProblemName = server.problem;
+      server.getFunctions(function(data, error) {
         return $scope.functions = data;
+      });
+      return server.joinGame().then(function(data) {
+        return $scope.info = data.data;
+      }, function(error) {
+        return $scope.error = error;
       });
     }
   ]).service('playerAuth', PlayerAuth).service('problemServer', ProblemServer);

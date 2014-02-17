@@ -27,3 +27,6 @@ Module.pad = (str, num, char) ->
 
 Module.repeatStr = (str, count) ->
   return (str for i in [0...count]).join("")
+
+Module.randInt = (min, max) ->
+  return Math.floor Math.random()*(max-min) - min

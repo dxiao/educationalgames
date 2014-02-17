@@ -32,18 +32,30 @@ class ProblemServer
 
   constructor: ($http, $location, @playerAuth) ->
     @http = $http
-    @getProblem = () -> $location.path().split("/")[2]
+    @location = $location
+
+  updateConfig: () ->
+    @problem = @location.path().split("/")[2]
+    @id = @playerAuth.player?.id
 
   getFunctions: (callback) ->
+    @updateConfig()
     @http {
       method: 'GET'
-      url: '/teamerapi/problem/' + @getProblem() + '/getFunctions'
-      params: {id: @playerAuth.player.id}
+      url: '/teamerapi/problem/' + @problem + '/getFunctions'
+      params: {id: @id}
     }
     .success (data, status) =>
       callback data, null
     .error (data, status) ->
       callback null, data
+
+  joinGame: () ->
+    @http {
+      method: 'GET'
+      url: '/teamerapi/game/' + @problem + '/joinGame'
+      params: {id: @id}
+    }
 
 angular.module 'teamer', ['ngRoute']
   .config ($routeProvider, $locationProvider) ->
@@ -85,9 +97,13 @@ angular.module 'teamer', ['ngRoute']
       return
 
     $scope.ProblemStage = "Stage 1"
-    $scope.ProblemName = server.getProblem()
+    $scope.ProblemName = server.problem
     server.getFunctions (data, error) ->
       $scope.functions = data
+    server.joinGame().then(
+      (data) -> $scope.info = data.data,
+      (error) -> $scope.error = error
+    )
   ]
 
   .service 'playerAuth', PlayerAuth

@@ -60,5 +60,6 @@ sqlServer = new Model.Function "sqlserver", finalProblems,
   "Given a SQL-like command in the following forms and a tree-based database, " +
   "do the command against the database, and return the result."
 
+suite.addFamilies treeFunctions, ioProblems, finalProblems
 suite.addFunctions treeInOrder, treeFindSize, treeInsert, parseInsert, parseSelect, printValues,
   treeNthLargest, sqlServer
