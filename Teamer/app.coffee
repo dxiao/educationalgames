@@ -62,6 +62,12 @@ class ProblemServer
     }
 
   submitImpl: (impl) ->
+    @http {
+      method: 'POST'
+      url: '/teamerapi/game/' + @problem + '/submitImpl'
+      params: {id: @id}
+      data: impl.toJson()
+    }
 
 angular.module 'teamer', ['ngRoute']
   .config ($routeProvider, $locationProvider) ->
@@ -108,19 +114,23 @@ angular.module 'teamer', ['ngRoute']
       server.getView()
     .then (data) ->
       $scope.view = Model.PlayerView.fromJson data.data, $scope.game
+      $scope.view.createImplsForStage 1
     .catch (error) ->
       $scope.error = error
 
-    $scope.openFunction = (func) ->
-      console.log "PROBCTL: changing function to " + func.name
-      $scope.currentFunction = func
-      $scope.currentFamily = $scope.game.families[func.family]
-      $scope.currentCode = "function (foo) {}"
+    $scope.openImpl = (impl) ->
+      console.log "PROBCTL: changing function to " + impl.function.name
+      $scope.activeImpl = impl
 
-    $scope.submitImpl = (impl) ->
-      server.sendImpl impl
+    $scope.codeEditor = {}
+
+    $scope.submitImpl = () ->
+      $scope.activeImpl.code = $scope.codeEditor.editor.getValue()
+      console.log "PROBCTL: submitting implementation for " + $scope.activeImpl.function.name
+      server.submitImpl $scope.activeImpl
       .then (data) ->
         $scope.info = data.data
+        $scope.activeImpl._dirty = false
       .catch (error) ->
         $scope.error = error
   ]
@@ -150,12 +160,11 @@ angular.module 'teamer', ['ngRoute']
         mode: "javascript"
         lineNumbers: true
       }
-      ### Because this doesn't seem to work
-      element.addClass "functionEditor"
-      editor = ace.edit element[0]
-      editor.setTheme "ace/theme/monokai"
-      editor.getSession().setMode "ace/mode/javascript"
-      ###
+      scope.codeEditor.editor = editor
+      scope.$watch 'activeImpl.code', (value) ->
+        editor.setValue value
+      editor.on "change", () ->
+        scope.activeImpl._dirty = true
 
   .service 'playerAuth', PlayerAuth
   .service 'problemServer', ProblemServer

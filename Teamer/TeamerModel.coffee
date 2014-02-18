@@ -10,22 +10,21 @@ else
 
 Module.Function = class Function
   constructor: (@name, @family, @description) ->
-    @phase = @family.phase
+    @stage = @family.stage
   toJson: () -> {
     name: @name
     family: @family.name
     description: @description
   }
   @fromJson: (json, families) ->
-    console.log families
     new Function json.name, families[json.family], json.description
     
 
 Module.FunctionFamily = class FunctionFamily
-  constructor: (@name, @phase, @description) ->
+  constructor: (@name, @stage, @description) ->
   toJson: () -> @
   @fromJson: (json) ->
-    new FunctionFamily json.name, json.phase, json.description
+    new FunctionFamily json.name, json.stage, json.description
 
 Module.ProblemSuite = class ProblemSuite
   constructor: (@name, @functions = {}) ->
@@ -42,14 +41,15 @@ Module.ProblemSuite = class ProblemSuite
 
 Module.Implementation = class Implementation
   constructor: (@function, @player, @code) ->
-    @_dirty = false
+    unless @code
+      @code = "//Your implementation (and documentation) here!"
   toJson: () -> {
       function: @function.name
       player: @player.id
-      code: code
+      code: @code
     }
   @fromJson: (json, functions, players) ->
-    new Implementation functions[json.function], players[json.player], code
+    new Implementation functions[json.function], players[json.player], json.code
 
 # Problem State
 
@@ -62,7 +62,7 @@ Module.GameInfo = class GameInfo
       players[id] = Player.fromJson player
     families = {}
     for id, family of json.families
-      families[id] = Player.fromJson family
+      families[id] = FunctionFamily.fromJson family
     new GameInfo json.name, GameStatus.fromJson(json.status), families, players
 
 Module.GameStatus = class GameStatus
@@ -83,6 +83,8 @@ Module.PlayerView = class PlayerView
   constructor: (@player, @game) ->
     @functions = []
     @impls = []
+  createImplsForStage: (stage) ->
+    @impls = @impls.concat (new Implementation(func, @player, "") for func in @functions when func.stage == stage)
   toJson: () -> {
     player: @player.id,
     game: @game.name,

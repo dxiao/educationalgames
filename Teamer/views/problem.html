@@ -15,17 +15,17 @@
   <div class="row">
     <div class="col-sm-3 side-bar">
       <ul class="list-group">
-        <li class="list-group-item" ng-repeat="func in view.functions" ng-click="openFunction(func)">
-        {{ func.name }}
+        <li class="list-group-item" ng-repeat="impl in view.impls" ng-click="openImpl(impl)">
+        {{ impl.function.name }}
         </li>
       </ul>
     </div>
     <div class="col-sm-9" role="main">
-      <div ng-show="currentFunction">
-        <h1>{{ currentFunction.name }}</h1>
-        <p>{{ currentFamily.description }}</p>
-        <p>{{ currentFunction.description }}</p>
-        <form>
+      <div ng-if="activeImpl">
+        <h1>{{ activeImpl.function.name }}</h1>
+        <p>{{ activeImpl.function.family.description }}</p>
+        <p>{{ activeImpl.function.description }}</p>
+        <form ng-submit="submitImpl()">
           <div class="form-group">
             <label>Your implementation:</label>
             <div function-editor></div>

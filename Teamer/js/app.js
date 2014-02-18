@@ -90,7 +90,16 @@
       });
     };
 
-    ProblemServer.prototype.submitImpl = function(impl) {};
+    ProblemServer.prototype.submitImpl = function(impl) {
+      return this.http({
+        method: 'POST',
+        url: '/teamerapi/game/' + this.problem + '/submitImpl',
+        params: {
+          id: this.id
+        },
+        data: impl.toJson()
+      });
+    };
 
     return ProblemServer;
 
@@ -136,19 +145,22 @@
         $scope.game = Model.GameInfo.fromJson(data.data);
         return server.getView();
       }).then(function(data) {
-        return $scope.view = Model.PlayerView.fromJson(data.data, $scope.game);
+        $scope.view = Model.PlayerView.fromJson(data.data, $scope.game);
+        return $scope.view.createImplsForStage(1);
       })["catch"](function(error) {
         return $scope.error = error;
       });
-      $scope.openFunction = function(func) {
-        console.log("PROBCTL: changing function to " + func.name);
-        $scope.currentFunction = func;
-        $scope.currentFamily = $scope.game.families[func.family];
-        return $scope.currentCode = "function (foo) {}";
+      $scope.openImpl = function(impl) {
+        console.log("PROBCTL: changing function to " + impl["function"].name);
+        return $scope.activeImpl = impl;
       };
-      return $scope.submitImpl = function(impl) {
-        return server.sendImpl(impl).then(function(data) {
-          return $scope.info = data.data;
+      $scope.codeEditor = {};
+      return $scope.submitImpl = function() {
+        $scope.activeImpl.code = $scope.codeEditor.editor.getValue();
+        console.log("PROBCTL: submitting implementation for " + $scope.activeImpl["function"].name);
+        return server.submitImpl($scope.activeImpl).then(function(data) {
+          $scope.info = data.data;
+          return $scope.activeImpl._dirty = false;
         })["catch"](function(error) {
           return $scope.error = error;
         });
@@ -177,18 +189,18 @@
   ]).directive('functionEditor', function() {
     return function(scope, element, attrs) {
       var editor;
-      return editor = CodeMirror(element[0], {
+      editor = CodeMirror(element[0], {
         value: "use strict;",
         mode: "javascript",
         lineNumbers: true
       });
-
-      /* Because this doesn't seem to work
-      element.addClass "functionEditor"
-      editor = ace.edit element[0]
-      editor.setTheme "ace/theme/monokai"
-      editor.getSession().setMode "ace/mode/javascript"
-       */
+      scope.codeEditor.editor = editor;
+      scope.$watch('activeImpl.code', function(value) {
+        return editor.setValue(value);
+      });
+      return editor.on("change", function() {
+        return scope.activeImpl._dirty = true;
+      });
     };
   }).service('playerAuth', PlayerAuth).service('problemServer', ProblemServer);
 

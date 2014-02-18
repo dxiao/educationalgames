@@ -18,7 +18,7 @@
       this.name = name;
       this.family = family;
       this.description = description;
-      this.phase = this.family.phase;
+      this.stage = this.family.stage;
     }
 
     Function.prototype.toJson = function() {
@@ -30,7 +30,6 @@
     };
 
     Function.fromJson = function(json, families) {
-      console.log(families);
       return new Function(json.name, families[json.family], json.description);
     };
 
@@ -39,9 +38,9 @@
   })();
 
   Module.FunctionFamily = FunctionFamily = (function() {
-    function FunctionFamily(name, phase, description) {
+    function FunctionFamily(name, stage, description) {
       this.name = name;
-      this.phase = phase;
+      this.stage = stage;
       this.description = description;
     }
 
@@ -50,7 +49,7 @@
     };
 
     FunctionFamily.fromJson = function(json) {
-      return new FunctionFamily(json.name, json.phase, json.description);
+      return new FunctionFamily(json.name, json.stage, json.description);
     };
 
     return FunctionFamily;
@@ -96,19 +95,21 @@
       this["function"] = _function;
       this.player = player;
       this.code = code;
-      this._dirty = false;
+      if (!this.code) {
+        this.code = "//Your implementation (and documentation) here!";
+      }
     }
 
     Implementation.prototype.toJson = function() {
       return {
         "function": this["function"].name,
         player: this.player.id,
-        code: code
+        code: this.code
       };
     };
 
     Implementation.fromJson = function(json, functions, players) {
-      return new Implementation(functions[json["function"]], players[json.player], code);
+      return new Implementation(functions[json["function"]], players[json.player], json.code);
     };
 
     return Implementation;
@@ -139,7 +140,7 @@
       _ref1 = json.families;
       for (id in _ref1) {
         family = _ref1[id];
-        families[id] = Player.fromJson(family);
+        families[id] = FunctionFamily.fromJson(family);
       }
       return new GameInfo(json.name, GameStatus.fromJson(json.status), families, players);
     };
@@ -191,6 +192,22 @@
       this.functions = [];
       this.impls = [];
     }
+
+    PlayerView.prototype.createImplsForStage = function(stage) {
+      var func;
+      return this.impls = this.impls.concat((function() {
+        var _i, _len, _ref, _results;
+        _ref = this.functions;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          func = _ref[_i];
+          if (func.stage === stage) {
+            _results.push(new Implementation(func, this.player, ""));
+          }
+        }
+        return _results;
+      }).call(this));
+    };
 
     PlayerView.prototype.toJson = function() {
       var func, impl;

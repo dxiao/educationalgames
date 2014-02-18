@@ -65,7 +65,7 @@ class Game
     @impls = {} # problem -> implementation
     @stage = 0
     @stageEndTime = Date.now() + STAGE_ONE_TIME
-    @stageOneAssigner = new FairAssigner (value for i, value of @problem.functions)
+    @stageOneAssigner = new FairAssigner (value for i, value of @problem.functions when value.stage == 1)
   joinPlayer: (player) ->
     if player.id of @players
       return @playerViewss[player.id]
@@ -77,6 +77,16 @@ class Game
     return new Model.GameStatus @stage, @stageEndTime
   getInfo: () ->
     return new Model.GameInfo @problem.name, @getStatus(), @problem.families, @players
+  setImpl: (newImpl) ->
+    impls = @playerViews[newImpl.player.id].impls
+    for impl, i in impls
+      if impl.function.name == newImpl.function.name
+        impls[i] = newImpl
+        console.log impls
+        return true
+    impls.push(newImpl)
+    console.log impls
+    return false
 
 class FairAssigner
   constructor: (@items) ->
@@ -126,6 +136,11 @@ Module.useExpressServer = (app) ->
     [player, game] = getPlayerAndGame req, res
     unless player? then return
     res.json game.playerViews[player.id].toJson()
+
+  app.post "/teamerapi/game/:game/submitImpl", (req, res) ->
+    [player, game] = getPlayerAndGame req, res
+    unless player? then return
+    res.json game.setImpl Model.Implementation.fromJson req.body, game.problem.functions, game.players
 
   app.get "/teamerapi/game/:game/getFunctions", (req, res) ->
     [player, game] = getPlayerAndGame req, res
