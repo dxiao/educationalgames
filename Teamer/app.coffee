@@ -38,19 +38,16 @@ class ProblemServer
     @problem = @location.path().split("/")[2]
     @id = @playerAuth.player?.id
 
-  getFunctions: (callback) ->
+  getFunctions: () ->
     @updateConfig()
     @http {
       method: 'GET'
-      url: '/teamerapi/problem/' + @problem + '/getFunctions'
+      url: '/teamerapi/game/' + @problem + '/getFunctions'
       params: {id: @id}
     }
-    .success (data, status) =>
-      callback data, null
-    .error (data, status) ->
-      callback null, data
 
   joinGame: () ->
+    @updateConfig()
     @http {
       method: 'GET'
       url: '/teamerapi/game/' + @problem + '/joinGame'
@@ -96,14 +93,15 @@ angular.module 'teamer', ['ngRoute']
     unless playerAuth.assertLoggedIn()
       return
 
-    $scope.ProblemStage = "Stage 1"
-    $scope.ProblemName = server.problem
-    server.getFunctions (data, error) ->
-      $scope.functions = data
-    server.joinGame().then(
-      (data) -> $scope.info = data.data,
-      (error) -> $scope.error = error
-    )
+    server.joinGame().then (data) ->
+      $scope.info = data.data
+      $scope.ProblemStage = "Stage 1"
+      $scope.ProblemName = server.problem
+      server.getFunctions()
+    .then (data) ->
+      $scope.functions = data.data
+    .catch (error) ->
+      $scope.error = error
   ]
 
   .service 'playerAuth', PlayerAuth

@@ -58,24 +58,19 @@
       return this.id = (_ref = this.playerAuth.player) != null ? _ref.id : void 0;
     };
 
-    ProblemServer.prototype.getFunctions = function(callback) {
+    ProblemServer.prototype.getFunctions = function() {
       this.updateConfig();
       return this.http({
         method: 'GET',
-        url: '/teamerapi/problem/' + this.problem + '/getFunctions',
+        url: '/teamerapi/game/' + this.problem + '/getFunctions',
         params: {
           id: this.id
         }
-      }).success((function(_this) {
-        return function(data, status) {
-          return callback(data, null);
-        };
-      })(this)).error(function(data, status) {
-        return callback(null, data);
       });
     };
 
     ProblemServer.prototype.joinGame = function() {
+      this.updateConfig();
       return this.http({
         method: 'GET',
         url: '/teamerapi/game/' + this.problem + '/joinGame',
@@ -125,14 +120,14 @@
       if (!playerAuth.assertLoggedIn()) {
         return;
       }
-      $scope.ProblemStage = "Stage 1";
-      $scope.ProblemName = server.problem;
-      server.getFunctions(function(data, error) {
-        return $scope.functions = data;
-      });
       return server.joinGame().then(function(data) {
-        return $scope.info = data.data;
-      }, function(error) {
+        $scope.info = data.data;
+        $scope.ProblemStage = "Stage 1";
+        $scope.ProblemName = server.problem;
+        return server.getFunctions();
+      }).then(function(data) {
+        return $scope.functions = data.data;
+      })["catch"](function(error) {
         return $scope.error = error;
       });
     }

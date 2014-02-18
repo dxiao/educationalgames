@@ -36,7 +36,7 @@ Utils = require "./utils.coffee"
 problems = {}
 problems.sql = require("./problems/sql.coffee").suite
 
-FUNCS_PER_PLAYER = 1
+FUNCS_PER_PLAYER = 3
 
 class PlayerRegistry
   constructor: () ->
@@ -67,7 +67,7 @@ class Game
     if player.id of @players
       return @players[player.id]
     newPlayer = new GamePlayer player, @
-    newPlayer.functions.concat @stageOneAssigner.assign FUNCS_PER_PLAYER
+    newPlayer.functions = newPlayer.functions.concat @stageOneAssigner.assign FUNCS_PER_PLAYER
     @players[player.id] = newPlayer
   getStatus: () ->
     return new Model.GameStatus @stage, 10
@@ -89,13 +89,24 @@ class FairAssigner
       if @itemsLeft.length == 0
         @itemsLeft = @items.slice 0
       n = Utils.randInt 0, @itemsLeft.length
-      assignment.concat @itemsLeft.splice n, 1
+      assignment.push @itemsLeft.splice(n, 1)[0]
     return assignment
 
 game = new Game problems.sql
 gameList = { sql: game}
 
 # ------------- Server ---------------
+
+getPlayerAndGame = (req, res) ->
+  id = req.query.id
+  game = req.params.game
+  unless game of gameList
+    res.send 404, "Requested game " + game + " not found on this server"
+    return [null, null]
+  unless id of playerRegistry.players
+    res.send 403, "Your player ID was not recognized"
+    return [null, null]
+  return [playerRegistry.players[id], gameList[game]]
 
 Module.useExpressServer = (app) ->
   app.use "/teamer/js", express.static(__dirname + "/js")
@@ -107,14 +118,15 @@ Module.useExpressServer = (app) ->
     res.sendfile __dirname + "/index.html"
 
   app.get "/teamerapi/game/:game/joinGame", (req, res) ->
-    id = req.query.id
-    game = req.params.game
-    unless game of gameList
-      res.send 404, "Requested game " + game + " not found on this server"
-    unless id of playerRegistry.players
-      res.send 403, "Your player ID was not recognized"
-    gameList[game].addPlayer playerRegistry.players[id]
-    res.send 200, gameList[game].getInfo()
+    [player, game] = getPlayerAndGame req, res
+    unless player? then return
+    game.addPlayer player
+    res.send 200, game.getInfo()
+
+  app.get "/teamerapi/game/:game/getFunctions", (req, res) ->
+    [player, game] = getPlayerAndGame req, res
+    unless player? then return
+    res.json game.players[player.id].functions
 
   app.get "/teamerapi/getProblems", (req, res) ->
     res.json Object.keys problems
