@@ -41,8 +41,6 @@ Module.ProblemSuite = class ProblemSuite
 
 Module.Implementation = class Implementation
   constructor: (@function, @player, @code) ->
-    unless @code
-      @code = "//Your implementation (and documentation) here!"
   toJson: () -> {
       function: @function.name
       player: @player.id

@@ -95,9 +95,6 @@
       this["function"] = _function;
       this.player = player;
       this.code = code;
-      if (!this.code) {
-        this.code = "//Your implementation (and documentation) here!";
-      }
     }
 
     Implementation.prototype.toJson = function() {

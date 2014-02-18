@@ -15,8 +15,12 @@
   <div class="row">
     <div class="col-sm-3 side-bar">
       <ul class="list-group">
-        <li class="list-group-item" ng-repeat="impl in view.impls" ng-click="openImpl(impl)">
-        {{ impl.function.name }}
+        <li class="list-group-item" ng-repeat="impl in view.impls" ng-click="openImpl(impl)"
+            ng-class="{active: activeImpl == impl}">
+          {{ impl.function.name }}
+          <span class='pull-right glyphicon glyphicon-unchecked' ng-if="impl._dirty === undefined"></span>
+          <span class='pull-right glyphicon glyphicon-check' ng-if="impl._dirty === false"></span>
+          <span class='pull-right glyphicon glyphicon-edit' ng-if="impl._dirty === true"></span>
         </li>
       </ul>
     </div>

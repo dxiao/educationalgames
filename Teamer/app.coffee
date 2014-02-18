@@ -161,8 +161,11 @@ angular.module 'teamer', ['ngRoute']
         lineNumbers: true
       }
       scope.codeEditor.editor = editor
-      scope.$watch 'activeImpl.code', (value) ->
-        editor.setValue value
+      scope.$watch 'activeImpl', (value) ->
+        unless value.code
+          value.code = "//Add your implementation (and documentation) here!\n"
+        editor.setValue value.code
+        scope.activeImpl._dirty = true
       editor.on "change", () ->
         scope.activeImpl._dirty = true
 
