@@ -117,14 +117,14 @@
   })();
 
   Module.GameInfo = GameInfo = (function() {
-    function GameInfo(gameName, gameStatus, families) {
-      this.gameName = gameName;
-      this.gameStatus = gameStatus;
+    function GameInfo(name, status, families) {
+      this.name = name;
+      this.status = status;
       this.families = families;
     }
 
     GameInfo.fromJson = function(json) {
-      return new GameInfo(json.gameName, GameStatus.fromJson(json.gameStage), json.families);
+      return new GameInfo(json.name, GameStatus.fromJson(json.status), json.families);
     };
 
     return GameInfo;
@@ -132,13 +132,13 @@
   })();
 
   Module.GameStatus = GameStatus = (function() {
-    function GameStatus(gameStage, stageEnd) {
-      this.gameStage = gameStage;
-      this.stageEnd = stageEnd;
+    function GameStatus(stage, endTime) {
+      this.stage = stage;
+      this.endTime = endTime;
     }
 
     GameStatus.fromJson = function(json) {
-      return new GameStatus(json.gameStage, json.stageEnd);
+      return new GameStatus(json.stage, json.endTime);
     };
 
     return GameStatus;

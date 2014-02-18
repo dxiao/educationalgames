@@ -7,7 +7,7 @@
     <p class="navbar-text">{{ ProblemName }}</p>
     <p class="navbar-text">{{ ProblemStage }}</p>
 
-    <div class="navbar-right navbar-text" countdown-timer="stageEndTime"></div>
+    <div class="navbar-right navbar-text" countdown-timer="info.status.endTime"></div>
   </div>
 </div>
 
@@ -24,13 +24,13 @@
       {{ info }}, {{ error }}
       <div ng-show="currentFunction">
         <h1>{{ currentFunction.name }}</h1>
+        <p>{{ currentFamily.description }}</p>
         <p>{{ currentFunction.description }}</p>
         <form>
           <div class="form-group">
             <label>Your implementation:</label>
             <div id="editor">function foo(items) {}</div>
     
-<script src="common/ace/ace.js" type="text/javascript" charset="utf-8"></script>
 <script>
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/monokai");

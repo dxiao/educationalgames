@@ -94,10 +94,7 @@ angular.module 'teamer', ['ngRoute']
       return
 
     server.joinGame().then (data) ->
-      $scope.info = data.data
-      $scope.ProblemStage = "Stage 1"
-      $scope.ProblemName = server.problem
-      $scope.stageEndTime = data.data.gameStatus.stageEnd
+      $scope.info = Model.GameInfo.fromJson data.data
       server.getFunctions()
     .then (data) ->
       $scope.functions = data.data
@@ -107,6 +104,7 @@ angular.module 'teamer', ['ngRoute']
     $scope.openFunction = (func) ->
       console.log "PROBCTL: changing function to " + func.name
       $scope.currentFunction = func
+      $scope.currentFamily = $scope.info.families[func.family]
   ]
 
   .directive 'countdownTimer', ['dateFilter', '$interval'

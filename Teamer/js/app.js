@@ -121,10 +121,7 @@
         return;
       }
       server.joinGame().then(function(data) {
-        $scope.info = data.data;
-        $scope.ProblemStage = "Stage 1";
-        $scope.ProblemName = server.problem;
-        $scope.stageEndTime = data.data.gameStatus.stageEnd;
+        $scope.info = Model.GameInfo.fromJson(data.data);
         return server.getFunctions();
       }).then(function(data) {
         return $scope.functions = data.data;
@@ -133,7 +130,8 @@
       });
       return $scope.openFunction = function(func) {
         console.log("PROBCTL: changing function to " + func.name);
-        return $scope.currentFunction = func;
+        $scope.currentFunction = func;
+        return $scope.currentFamily = $scope.info.families[func.family];
       };
     }
   ]).directive('countdownTimer', [

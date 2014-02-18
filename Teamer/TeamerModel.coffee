@@ -50,15 +50,15 @@ Module.ProblemState = class ProblemState
   addImplementation: (implementation) ->
 
 Module.GameInfo = class GameInfo
-  constructor: (@gameName, @gameStatus, @families) ->
+  constructor: (@name, @status, @families) ->
   @fromJson: (json) ->
-    return new GameInfo json.gameName, GameStatus.fromJson(json.gameStage),
+    return new GameInfo json.name, GameStatus.fromJson(json.status),
       json.families
 
 Module.GameStatus = class GameStatus
-  constructor: (@gameStage, @stageEnd) ->
+  constructor: (@stage, @endTime) ->
   @fromJson: (json) ->
-    return new GameStatus json.gameStage, json.stageEnd
+    return new GameStatus json.stage, json.endTime
     
 # User Information
 

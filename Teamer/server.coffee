@@ -37,7 +37,7 @@ problems = {}
 problems.sql = require("./problems/sql.coffee").suite
 
 FUNCS_PER_PLAYER = 3
-STAGE_ONE_TIME = 1000 * 30 # 30 seconds
+STAGE_ONE_TIME = 1000 * 60 * 20
 
 class PlayerRegistry
   constructor: () ->
