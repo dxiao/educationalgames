@@ -120,7 +120,7 @@
       if (!playerAuth.assertLoggedIn()) {
         return;
       }
-      return server.joinGame().then(function(data) {
+      server.joinGame().then(function(data) {
         $scope.info = data.data;
         $scope.ProblemStage = "Stage 1";
         $scope.ProblemName = server.problem;
@@ -131,6 +131,10 @@
       })["catch"](function(error) {
         return $scope.error = error;
       });
+      return $scope.openFunction = function(func) {
+        console.log("PROBCTL: changing function to " + func.name);
+        return $scope.currentFunction = func;
+      };
     }
   ]).directive('countdownTimer', [
     'dateFilter', '$interval', function(dateFilter, $interval) {

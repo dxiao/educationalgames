@@ -15,13 +15,31 @@
   <div class="row">
     <div class="col-sm-3 side-bar">
       <ul class="list-group">
-        <li class="list-group-item" ng-repeat="func in functions">
+        <li class="list-group-item" ng-repeat="func in functions" ng-click="openFunction(func)">
         {{ func.name }}
         </li>
       </ul>
     </div>
     <div class="col-sm-9" role="main">
       {{ info }}, {{ error }}
+      <div ng-show="currentFunction">
+        <h1>{{ currentFunction.name }}</h1>
+        <p>{{ currentFunction.description }}</p>
+        <form>
+          <div class="form-group">
+            <label>Your implementation:</label>
+            <div id="editor">function foo(items) {}</div>
+    
+<script src="common/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.getSession().setMode("ace/mode/javascript");
+</script>
+          </div>
+          <button type="submit" class="btn btn-success">Submit!</button>
+        </form>
+      </div>
     </div>
   </div>
 </div>

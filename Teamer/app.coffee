@@ -76,7 +76,7 @@ angular.module 'teamer', ['ngRoute']
       $scope.loginError = false
       $scope.id = playerAuth.submitLogin $scope.loginname, (player, error) ->
         if player
-          $location.path("")
+          $location.path ""
         else
           $scope.loginError = error
   ]
@@ -103,6 +103,10 @@ angular.module 'teamer', ['ngRoute']
       $scope.functions = data.data
     .catch (error) ->
       $scope.error = error
+
+    $scope.openFunction = (func) ->
+      console.log "PROBCTL: changing function to " + func.name
+      $scope.currentFunction = func
   ]
 
   .directive 'countdownTimer', ['dateFilter', '$interval'
