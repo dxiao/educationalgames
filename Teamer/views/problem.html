@@ -27,14 +27,13 @@
     <div class="col-sm-9" role="main">
       <div ng-if="activeImpl">
         <h1>{{ activeImpl.function.name }}</h1>
-        <p>{{ activeImpl.function.family.description }}</p>
+        <p class="family-description">{{ activeImpl.function.family.description }}</p>
         <p>{{ activeImpl.function.description }}</p>
         <form ng-submit="submitImpl()">
           <div class="form-group">
-            <label>Your implementation:</label>
             <div function-editor></div>
+            <button type="submit" class="btn btn-success">Submit!</button>
           </div>
-          <button type="submit" class="btn btn-success">Submit!</button>
         </form>
       </div>
       <div ng-show="info" class="alert alert-success">
@@ -43,6 +42,15 @@
       <div ng-show="error" class="alert alert-danger">
         {{ error }}
       </div>
+    </div>
+    <div ng-hide="activeImpl">
+      <h2>Welcome to stage 1!</h2>
+      <p>
+      You have 20 minutes to code as the three functions listed to the left as well as you can.
+      In stage 2, you'll have a chance to review your code in comparison with others, and
+      in stage 3, you'll be able to use your and others' code to create a much large function.
+      Good luck!
+      </p>
     </div>
   </div>
 </div>
