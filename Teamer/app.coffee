@@ -105,6 +105,7 @@ angular.module 'teamer', ['ngRoute']
       console.log "PROBCTL: changing function to " + func.name
       $scope.currentFunction = func
       $scope.currentFamily = $scope.info.families[func.family]
+      $scope.currentCode = "function (foo) {}"
   ]
 
   .directive 'countdownTimer', ['dateFilter', '$interval'
@@ -124,6 +125,20 @@ angular.module 'teamer', ['ngRoute']
       element.bind '$destroy', () ->
         $interval.cancel timer
   ]
+
+  .directive 'functionEditor', () ->
+    (scope, element, attrs) ->
+      editor = CodeMirror element[0], {
+        value: "use strict;"
+        mode: "javascript"
+        lineNumbers: true
+      }
+      ### Because this doesn't seem to work
+      element.addClass "functionEditor"
+      editor = ace.edit element[0]
+      editor.setTheme "ace/theme/monokai"
+      editor.getSession().setMode "ace/mode/javascript"
+      ###
 
   .service 'playerAuth', PlayerAuth
   .service 'problemServer', ProblemServer

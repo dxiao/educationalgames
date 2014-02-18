@@ -21,7 +21,6 @@
       </ul>
     </div>
     <div class="col-sm-9" role="main">
-      {{ info }}, {{ error }}
       <div ng-show="currentFunction">
         <h1>{{ currentFunction.name }}</h1>
         <p>{{ currentFamily.description }}</p>
@@ -29,16 +28,11 @@
         <form>
           <div class="form-group">
             <label>Your implementation:</label>
-            <div id="editor">function foo(items) {}</div>
-    
-<script>
-    var editor = ace.edit("editor");
-    editor.setTheme("ace/theme/monokai");
-    editor.getSession().setMode("ace/mode/javascript");
-</script>
+            <div function-editor></div>
           </div>
           <button type="submit" class="btn btn-success">Submit!</button>
         </form>
+        {{ info }}, {{ error }}
       </div>
     </div>
   </div>

@@ -131,7 +131,8 @@
       return $scope.openFunction = function(func) {
         console.log("PROBCTL: changing function to " + func.name);
         $scope.currentFunction = func;
-        return $scope.currentFamily = $scope.info.families[func.family];
+        $scope.currentFamily = $scope.info.families[func.family];
+        return $scope.currentCode = "function (foo) {}";
       };
     }
   ]).directive('countdownTimer', [
@@ -154,7 +155,23 @@
         });
       };
     }
-  ]).service('playerAuth', PlayerAuth).service('problemServer', ProblemServer);
+  ]).directive('functionEditor', function() {
+    return function(scope, element, attrs) {
+      var editor;
+      return editor = CodeMirror(element[0], {
+        value: "use strict;",
+        mode: "javascript",
+        lineNumbers: true
+      });
+
+      /* Because this doesn't seem to work
+      element.addClass "functionEditor"
+      editor = ace.edit element[0]
+      editor.setTheme "ace/theme/monokai"
+      editor.getSession().setMode "ace/mode/javascript"
+       */
+    };
+  }).service('playerAuth', PlayerAuth).service('problemServer', ProblemServer);
 
 }).call(this);
 
