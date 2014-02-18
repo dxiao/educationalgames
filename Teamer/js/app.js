@@ -109,7 +109,7 @@
     return $routeProvider.when('/login', {
       templateUrl: 'teamer/views/login.html',
       controller: 'LoginController'
-    }).when('/problem/:problem/:stage', {
+    }).when('/problem/:problem', {
       templateUrl: 'teamer/views/problem.html',
       controller: 'ProblemController'
     }).otherwise({
@@ -133,7 +133,7 @@
     '$location', 'playerAuth', function($location, playerAuth) {
       if (playerAuth.assertLoggedIn()) {
         console.log("INIT: player detected, redirecting to problem");
-        return $location.path("/problem/sql/phase1");
+        return $location.path("/problem/sql/");
       }
     }
   ]).controller('ProblemController', [

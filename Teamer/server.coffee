@@ -37,7 +37,12 @@ problems = {}
 problems.sql = require("./problems/sql.coffee").suite
 
 FUNCS_PER_PLAYER = 3
-STAGE_ONE_TIME = 1000 * 60 * 20
+IMPLS_PER_FUNC = 3
+STAGE_TIMES = [0
+               #1000 * 60 * 21,
+               1000 * 20,
+               1000 * 60 * 16,
+               1000 * 60 * 21]
 
 class PlayerRegistry
   constructor: () ->
@@ -62,42 +67,100 @@ class Game
   constructor: (@problem) ->
     @players = {} # id -> Player
     @playerViews = {} # id -> PlayerView
-    @impls = {} # problem -> implementation
+    @playerView2s = {} # id -> PlayerView2
+    @impls = {} # func -> player -> implementation
+    @reviews = {} # func -> player -> implementation
+    for name, func of @problem.functions
+      @impls[name] = {}
+      @reviews[name] = {}
     @stage = 0
-    @stageEndTime = Date.now() + STAGE_ONE_TIME
+    @nextStageSetup = @setupStageOne
+    @startNextStage()
+
+  startNextStage: () ->
+    @stage += 1
+    @nextStageSetup()
+    @stageEndTime = Date.now() + STAGE_TIMES[@stage]
+    if @stageTimeout?
+      clearTimeout @stageTimeout
+    @stageTimeout = setTimeout (() => @startNextStage()), @stageEndTime - Date.now()
+
+  setupStageOne: () ->
     @stageOneAssigner = new FairAssigner (value for i, value of @problem.functions when value.stage == 1)
+    @nextStageSetup = @setupStageTwo
+
+  setupStageTwo: () ->
+    @stageTwoAssigners = {}
+    #initialize assigners
+    for name, func of @problem.functions
+      if func.stage == 1
+        @stageTwoAssigners[name] = new FairAssigner (impl for i, impl of @impls[name])
+    #for each player, convert view1 to view2
+    for pid, playerView of @playerViews
+      @convertPlayerViewToStage2 playerView
+
   joinPlayer: (player) ->
     if player.id of @players
-      return @playerViewss[player.id]
+      return @playerViews[player.id]
     newPlayerView = new Model.PlayerView player, @
     newPlayerView.functions = newPlayerView.functions.concat @stageOneAssigner.assign FUNCS_PER_PLAYER
     @players[player.id] = player
     @playerViews[player.id] = newPlayerView
+    if @stage > 1
+      convertPlayerViewToStage2 newPlayerView
+
+  convertPlayerViewToStage2: (playerView) ->
+    pid = playerView.player.id
+    newPlayerView = new Model.PlayerView2 playerView
+    for fid, func of newPlayerView.functions
+      impls = @stageTwoAssigners[fid].assign IMPLS_PER_FUNC
+      implMap = {}
+      reviewMap = {}
+      for impl in impls
+        pid = impl.player.id
+        implMap[pid] = impl
+        reviewMap[pid] = @reviews[fid][pid]
+      newPlayerView.impls[fid] = implMap
+      newPlayerView.reviews[fid] = reviewMap
+    @playerView2s[id] = newPlayerView
+
   getStatus: () ->
     return new Model.GameStatus @stage, @stageEndTime
   getInfo: () ->
     return new Model.GameInfo @problem.name, @getStatus(), @problem.families, @players
   setImpl: (newImpl) ->
-    impls = @playerViews[newImpl.player.id].impls
+    if newImpl.function.stage != @stage
+      return "Server is currently at stage " + @stage + ", and can not accept that implementation"
+
+    # see if newImpl is already in views/game, and if so, merge it in
+    pid = newImpl.player.id
+    fid = newImpl.function.name
+    impls = @playerViews[pid].impls
     for impl, i in impls
-      if impl.function.name == newImpl.function.name
-        impls[i] = newImpl
-        console.log impls
-        return true
+      if impl.function.name == fid
+        impls[i].code = newImpl.code
+        return
     impls.push(newImpl)
-    console.log impls
-    return false
+    @impls[fid][pid] = newImpl
+    @reviews[fid][pid] = new Model.ImplReviewSet newImpl
+    return
 
 class FairAssigner
   constructor: (@items) ->
-    assert @items.length > 0, "Need at least one item to assign!"
+    if @items.length > 0
+      console.warn "WARNING: Need at least one item to assign!"
     @itemsLeft = @items.slice 0
   assign: (count) ->
     assignment = []
     for i in [0...count]
       if @itemsLeft.length == 0
         @itemsLeft = @items.slice 0
+      tryCount = 0
       n = Utils.randInt 0, @itemsLeft.length
+      while @itemsLeft[n] in assignment and tryCount < 10
+        n = Utils.randInt 0, @itemsLeft.length
+      if tryCount >= 10
+        return assignment
       assignment.push @itemsLeft.splice(n, 1)[0]
     return assignment
 
@@ -140,7 +203,11 @@ Module.useExpressServer = (app) ->
   app.post "/teamerapi/game/:game/submitImpl", (req, res) ->
     [player, game] = getPlayerAndGame req, res
     unless player? then return
-    res.json game.setImpl Model.Implementation.fromJson req.body, game.problem.functions, game.players
+    error = game.setImpl Model.Implementation.fromJson req.body, game.problem.functions, game.players
+    if error?
+      res.send 403, error
+    else
+      res.send 200
 
   app.get "/teamerapi/game/:game/getFunctions", (req, res) ->
     [player, game] = getPlayerAndGame req, res
@@ -149,11 +216,6 @@ Module.useExpressServer = (app) ->
 
   app.get "/teamerapi/getProblems", (req, res) ->
     res.json Object.keys problems
-
-  app.get "/teamerapi/problem/:problem/start", (req, res) ->
-    
-  app.get "/teamerapi/problem/:problem/getFunctions", (req, res) ->
-    res.json problems[req.params.problem].functions
 
   app.get "/teamerapi/login", (req, res) ->
     name = req.query.name

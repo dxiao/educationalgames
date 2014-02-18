@@ -42,12 +42,53 @@ Module.ProblemSuite = class ProblemSuite
 Module.Implementation = class Implementation
   constructor: (@function, @player, @code) ->
   toJson: () -> {
-      function: @function.name
-      player: @player.id
-      code: @code
-    }
+    function: @function.name
+    player: @player.id
+    code: @code
+  }
+  toShortJson: () -> {
+    func: @function.name
+    player: @player.id
+  }
   @fromJson: (json, functions, players) ->
     new Implementation functions[json.function], players[json.player], json.code
+
+Module.ImplReview = class ImplReview
+  constructor: (@impl, @player, @rating, @comment) ->
+  toJson: () -> {
+    impl: @impl.toShortJson()
+    player: @player.id
+    rating: @rating
+    comment: @comment
+  }
+  @fromJson: (json, funcToImplList, players) ->
+    new ImplReview funcToImplList[json.impl.func][json.impl.player],
+      players[json.player], json.rating, json.comment
+
+Module.ImplReviewSet = class ImplReviewSet
+  constructor: (@impl, @reviews, @rating) ->
+    unless @rating
+      @rating = new ImplRating(0, 0)
+    unless @reviews
+      @reviews = []
+  toJson: () -> {
+    impl: @impl.toShortJson()
+    reviews: (review.toJson() for review in @reviews)
+    rating: @rating.toJson()
+  }
+  @fromJson: (json, funcToImplList, players) ->
+    new ImplReviewSet funcToImplList[json.impl.func][json.impl.player],
+      (ImplReview.fromJson(review, funcToImplList, players) for review in json.reviews),
+      ImplRating.fromJson(json.rating)
+ 
+Module.ImplRating = class ImplRating
+  constructor: (@num, @denom) ->
+  addRating: (rating) ->
+    @num += rating
+    @denom += 1
+  toJson: () -> @
+  @fromJson: (json) ->
+    new ImplRating json.num, json.denom
 
 # Problem State
 
@@ -94,4 +135,40 @@ Module.PlayerView = class PlayerView
     gamePlayer.functions = (Function.fromJson(func, game.families) for func in json.functions)
     gamePlayer.impls = (Implementation.fromJson(impl, gamePlayer.functions, game.players) for impl in json.impls)
     gamePlayer
+
+Module.PlayerView2 = class PlayerView2
+  constructor: (playerView1) ->
+    @player = playerView1.player
+    @game = playerView1.game
+    @functions = {} # id -> func
+    @impls = {} # func -> player -> impl
+    @reviews = {} # func -> player -> review
+    for func in playerView1.functions
+      @functions[func.name] = func
+      @impls[func.name] = {}
+      @reviews[func.name] = {}
+  _makeToJson: (mapmapitem) ->
+    mapmapjson = {}
+    for key, mapitem of mapmapitem
+      mapjson = {}
+      for keykey, item of mapitem
+        mapjson[keykey] = item.toJson()
+      mapmapjson[key] = mapjson
+    mapmapjson
+  toJson: () -> {
+    impls: _makeToJson @impls
+    reviews: _makeToJson @review
+  }
+  @fromJson: (json, playerView1) ->
+    newView = new PlayerView2 playerView1
+    functions = newView.functions
+    players = newView.game.players
+    newView.impls = json.impls
+    for key, mapitem of newView.impls
+      for keykey of mapitem
+        mapitem[keykey] = Implmementation.fromJson mapitem[keykey], functions, players
+    newView.reviews = json.reviews
+    for key, mapitem of newView.reviews
+      for keykey of mapitem
+        mapitem[keykey] = ImplReviewSet.fromJson mapitem[keykey], newView.impls, players
 

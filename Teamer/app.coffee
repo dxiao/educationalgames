@@ -76,7 +76,7 @@ angular.module 'teamer', ['ngRoute']
         templateUrl: 'teamer/views/login.html'
         controller: 'LoginController'
       }
-      .when '/problem/:problem/:stage', {
+      .when '/problem/:problem', {
         templateUrl: 'teamer/views/problem.html'
         controller: 'ProblemController'
       }
@@ -100,7 +100,7 @@ angular.module 'teamer', ['ngRoute']
   ($location, playerAuth) ->
     if playerAuth.assertLoggedIn()
       console.log "INIT: player detected, redirecting to problem"
-      $location.path "/problem/sql/phase1"
+      $location.path "/problem/sql/"
   ]
 
   .controller 'ProblemController', ['$scope', 'playerAuth', 'problemServer',
