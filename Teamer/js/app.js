@@ -69,6 +69,16 @@
       });
     };
 
+    ProblemServer.prototype.getView = function() {
+      return this.http({
+        method: 'GET',
+        url: '/teamerapi/game/' + this.problem + '/getView',
+        params: {
+          id: this.id
+        }
+      });
+    };
+
     ProblemServer.prototype.joinGame = function() {
       this.updateConfig();
       return this.http({
@@ -79,6 +89,8 @@
         }
       });
     };
+
+    ProblemServer.prototype.submitImpl = function(impl) {};
 
     return ProblemServer;
 
@@ -121,18 +133,25 @@
         return;
       }
       server.joinGame().then(function(data) {
-        $scope.info = Model.GameInfo.fromJson(data.data);
-        return server.getFunctions();
+        $scope.game = Model.GameInfo.fromJson(data.data);
+        return server.getView();
       }).then(function(data) {
-        return $scope.functions = data.data;
+        return $scope.view = Model.PlayerView.fromJson(data.data, $scope.game);
       })["catch"](function(error) {
         return $scope.error = error;
       });
-      return $scope.openFunction = function(func) {
+      $scope.openFunction = function(func) {
         console.log("PROBCTL: changing function to " + func.name);
         $scope.currentFunction = func;
-        $scope.currentFamily = $scope.info.families[func.family];
+        $scope.currentFamily = $scope.game.families[func.family];
         return $scope.currentCode = "function (foo) {}";
+      };
+      return $scope.submitImpl = function(impl) {
+        return server.sendImpl(impl).then(function(data) {
+          return $scope.info = data.data;
+        })["catch"](function(error) {
+          return $scope.error = error;
+        });
       };
     }
   ]).directive('countdownTimer', [

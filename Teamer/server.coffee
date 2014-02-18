@@ -60,26 +60,23 @@ playerRegistry = new PlayerRegistry()
 
 class Game
   constructor: (@problem) ->
-    @players = {} # id -> GamePlayer
+    @players = {} # id -> Player
+    @playerViews = {} # id -> PlayerView
     @impls = {} # problem -> implementation
     @stage = 0
     @stageEndTime = Date.now() + STAGE_ONE_TIME
     @stageOneAssigner = new FairAssigner (value for i, value of @problem.functions)
-  addPlayer: (player) ->
+  joinPlayer: (player) ->
     if player.id of @players
-      return @players[player.id]
-    newPlayer = new GamePlayer player, @
-    newPlayer.functions = newPlayer.functions.concat @stageOneAssigner.assign FUNCS_PER_PLAYER
-    @players[player.id] = newPlayer
+      return @playerViewss[player.id]
+    newPlayerView = new Model.PlayerView player, @
+    newPlayerView.functions = newPlayerView.functions.concat @stageOneAssigner.assign FUNCS_PER_PLAYER
+    @players[player.id] = player
+    @playerViews[player.id] = newPlayerView
   getStatus: () ->
     return new Model.GameStatus @stage, @stageEndTime
   getInfo: () ->
-    return new Model.GameInfo @problem.name, @getStatus(), @problem.families
-
-class GamePlayer
-  constructor: (@player, @game) ->
-    @functions = []
-    @impls = []
+    return new Model.GameInfo @problem.name, @getStatus(), @problem.families, @players
 
 class FairAssigner
   constructor: (@items) ->
@@ -122,13 +119,18 @@ Module.useExpressServer = (app) ->
   app.get "/teamerapi/game/:game/joinGame", (req, res) ->
     [player, game] = getPlayerAndGame req, res
     unless player? then return
-    game.addPlayer player
+    game.joinPlayer player
     res.send 200, game.getInfo()
+
+  app.get "/teamerapi/game/:game/getView", (req, res) ->
+    [player, game] = getPlayerAndGame req, res
+    unless player? then return
+    res.json game.playerViews[player.id].toJson()
 
   app.get "/teamerapi/game/:game/getFunctions", (req, res) ->
     [player, game] = getPlayerAndGame req, res
     unless player? then return
-    res.json game.players[player.id].functions
+    res.json game.playerViews[player.id].functions
 
   app.get "/teamerapi/getProblems", (req, res) ->
     res.json Object.keys problems

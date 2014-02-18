@@ -46,6 +46,13 @@ class ProblemServer
       params: {id: @id}
     }
 
+  getView: () ->
+    @http {
+      method: 'GET'
+      url: '/teamerapi/game/' + @problem + '/getView'
+      params: {id: @id}
+    }
+
   joinGame: () ->
     @updateConfig()
     @http {
@@ -53,6 +60,8 @@ class ProblemServer
       url: '/teamerapi/game/' + @problem + '/joinGame'
       params: {id: @id}
     }
+
+  submitImpl: (impl) ->
 
 angular.module 'teamer', ['ngRoute']
   .config ($routeProvider, $locationProvider) ->
@@ -93,19 +102,27 @@ angular.module 'teamer', ['ngRoute']
     unless playerAuth.assertLoggedIn()
       return
 
-    server.joinGame().then (data) ->
-      $scope.info = Model.GameInfo.fromJson data.data
-      server.getFunctions()
+    server.joinGame()
     .then (data) ->
-      $scope.functions = data.data
+      $scope.game = Model.GameInfo.fromJson data.data
+      server.getView()
+    .then (data) ->
+      $scope.view = Model.PlayerView.fromJson data.data, $scope.game
     .catch (error) ->
       $scope.error = error
 
     $scope.openFunction = (func) ->
       console.log "PROBCTL: changing function to " + func.name
       $scope.currentFunction = func
-      $scope.currentFamily = $scope.info.families[func.family]
+      $scope.currentFamily = $scope.game.families[func.family]
       $scope.currentCode = "function (foo) {}"
+
+    $scope.submitImpl = (impl) ->
+      server.sendImpl impl
+      .then (data) ->
+        $scope.info = data.data
+      .catch (error) ->
+        $scope.error = error
   ]
 
   .directive 'countdownTimer', ['dateFilter', '$interval'

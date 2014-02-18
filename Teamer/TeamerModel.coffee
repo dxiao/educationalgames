@@ -9,12 +9,23 @@ else
 # Problem Description
 
 Module.Function = class Function
-  constructor: (@name, family, @description) ->
-    @family = family.name
-    @phase = family.phase
+  constructor: (@name, @family, @description) ->
+    @phase = @family.phase
+  toJson: () -> {
+    name: @name
+    family: @family.name
+    description: @description
+  }
+  @fromJson: (json, families) ->
+    console.log families
+    new Function json.name, families[json.family], json.description
+    
 
 Module.FunctionFamily = class FunctionFamily
   constructor: (@name, @phase, @description) ->
+  toJson: () -> @
+  @fromJson: (json) ->
+    new FunctionFamily json.name, json.phase, json.description
 
 Module.ProblemSuite = class ProblemSuite
   constructor: (@name, @functions = {}) ->
@@ -30,33 +41,33 @@ Module.ProblemSuite = class ProblemSuite
 # Problem Submissions
 
 Module.Implementation = class Implementation
-  constructor: (@function, @user, @code) ->
-
-Module.ProblemRound = class ProblemRound
-  constructor: (@problem, @id) ->
-    @players = {}
-  addPlayer: (player) ->
-    unless player.name in @players
-      @players[player.name] = player
-    else
-      throw new Error "Player already added to round!"
+  constructor: (@function, @player, @code) ->
+    @_dirty = false
+  toJson: () -> {
+      function: @function.name
+      player: @player.id
+      code: code
+    }
+  @fromJson: (json, functions, players) ->
+    new Implementation functions[json.function], players[json.player], code
 
 # Problem State
 
-Module.ProblemState = class ProblemState
-  constructor: (@problem, @starttime) ->
-    @implementations = {} # problem -> implementation
-    @feedback = {} # implementation -> feedback
-  addImplementation: (implementation) ->
-
 Module.GameInfo = class GameInfo
-  constructor: (@name, @status, @families) ->
+  constructor: (@name, @status, @families, @players) ->
+  toJson: () -> @
   @fromJson: (json) ->
-    return new GameInfo json.name, GameStatus.fromJson(json.status),
-      json.families
+    players = {}
+    for id, player of json.players
+      players[id] = Player.fromJson player
+    families = {}
+    for id, family of json.families
+      families[id] = Player.fromJson family
+    new GameInfo json.name, GameStatus.fromJson(json.status), families, players
 
 Module.GameStatus = class GameStatus
   constructor: (@stage, @endTime) ->
+  toJson: () -> @
   @fromJson: (json) ->
     return new GameStatus json.stage, json.endTime
     
@@ -64,11 +75,23 @@ Module.GameStatus = class GameStatus
 
 Module.Player = class Player
   constructor: (@id, @name) ->
+  toJson: () -> @
+  @fromJson: (json) ->
+    new Player json.id, json.name
 
 Module.PlayerView = class PlayerView
-  constructor: (@player, @functions) ->
-    @impl = {}
-  addImplementation: (impl) ->
-  toJson: () ->
-  @fromJson: (json) ->
+  constructor: (@player, @game) ->
+    @functions = []
+    @impls = []
+  toJson: () -> {
+    player: @player.id,
+    game: @game.name,
+    functions: (func.toJson() for func in @functions)
+    impls: (impl.toJson() for impl in  @impls)
+  }
+  @fromJson: (json, game) ->
+    gamePlayer = new PlayerView game.players[json.player], game
+    gamePlayer.functions = (Function.fromJson(func, game.families) for func in json.functions)
+    gamePlayer.impls = (Implementation.fromJson(impl, gamePlayer.functions, game.players) for impl in json.impls)
+    gamePlayer
 
