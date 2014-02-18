@@ -5,6 +5,7 @@ express = require "express"
 http = require "http"
 fs = require "fs"
 assert = require "assert"
+serialize = require "node-serialize"
 Model = require "./TeamerModel.coffee"
 Utils = require "./utils.coffee"
 
@@ -43,6 +44,19 @@ STAGE_TIMES = [0
                1000 * 20,
                1000 * 60 * 16,
                1000 * 60 * 21]
+
+saveState = (label) ->
+  saveJson = (obj, label) ->
+    #console.log obj
+    fs.writeFileSync 'state-' + Date.now() + '-' + label + '.json',  obj
+
+  saveJson serialize.serialize({
+    game: game
+    gameList: gameList
+    playerRegistry: playerRegistry
+    getPlayerAndGame: getPlayerAndGame
+  }), label
+
 
 class PlayerRegistry
   constructor: () ->
@@ -90,6 +104,7 @@ class Game
     @nextStageSetup = @setupStageTwo
 
   setupStageTwo: () ->
+    saveState "endStageOne"
     @stageTwoAssigners = {}
     #initialize assigners
     for name, func of @problem.functions
@@ -98,6 +113,7 @@ class Game
     #for each player, convert view1 to view2
     for pid, playerView of @playerViews
       @convertPlayerViewToStage2 playerView
+    saveState "startStageTwo"
 
   joinPlayer: (player) ->
     if player.id of @players
@@ -130,6 +146,7 @@ class Game
     return new Model.GameStatus @stage, @stageEndTime
   getInfo: () ->
     return new Model.GameInfo @problem.name, @getStatus(), @problem.families, @players
+
   setImpl: (newImpl) ->
     if newImpl.function.stage != @stage
       return "Server is currently at stage " + @stage + ", and can not accept that implementation"
