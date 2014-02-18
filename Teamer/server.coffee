@@ -107,12 +107,14 @@ class Game
     @players[player.id] = player
     @playerViews[player.id] = newPlayerView
     if @stage > 1
-      convertPlayerViewToStage2 newPlayerView
+      @convertPlayerViewToStage2 newPlayerView
 
   convertPlayerViewToStage2: (playerView) ->
     pid = playerView.player.id
     newPlayerView = new Model.PlayerView2 playerView
+    console.log "player " + pid
     for fid, func of newPlayerView.functions
+      console.log "  function " + fid
       impls = @stageTwoAssigners[fid].assign IMPLS_PER_FUNC
       implMap = {}
       reviewMap = {}
@@ -122,7 +124,7 @@ class Game
         reviewMap[pid] = @reviews[fid][pid]
       newPlayerView.impls[fid] = implMap
       newPlayerView.reviews[fid] = reviewMap
-    @playerView2s[id] = newPlayerView
+    @playerView2s[pid] = newPlayerView
 
   getStatus: () ->
     return new Model.GameStatus @stage, @stageEndTime
@@ -147,7 +149,7 @@ class Game
 
 class FairAssigner
   constructor: (@items) ->
-    if @items.length > 0
+    if @items.length <= 0
       console.warn "WARNING: Need at least one item to assign!"
     @itemsLeft = @items.slice 0
   assign: (count) ->
@@ -159,6 +161,7 @@ class FairAssigner
       n = Utils.randInt 0, @itemsLeft.length
       while @itemsLeft[n] in assignment and tryCount < 10
         n = Utils.randInt 0, @itemsLeft.length
+        tryCount++
       if tryCount >= 10
         return assignment
       assignment.push @itemsLeft.splice(n, 1)[0]
@@ -195,10 +198,20 @@ Module.useExpressServer = (app) ->
     game.joinPlayer player
     res.send 200, game.getInfo()
 
+  app.get "/teamerapi/game/:game/getGameInfo", (req, res) ->
+    [player, game] = getPlayerAndGame req, res
+    unless player? then return
+    res.send 200, game.getInfo()
+
   app.get "/teamerapi/game/:game/getView", (req, res) ->
     [player, game] = getPlayerAndGame req, res
     unless player? then return
     res.json game.playerViews[player.id].toJson()
+
+  app.get "/teamerapi/game/:game/getView2", (req, res) ->
+    [player, game] = getPlayerAndGame req, res
+    unless player? then return
+    res.json game.playerView2s[player.id].toJson()
 
   app.post "/teamerapi/game/:game/submitImpl", (req, res) ->
     [player, game] = getPlayerAndGame req, res

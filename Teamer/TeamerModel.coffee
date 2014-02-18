@@ -156,8 +156,8 @@ Module.PlayerView2 = class PlayerView2
       mapmapjson[key] = mapjson
     mapmapjson
   toJson: () -> {
-    impls: _makeToJson @impls
-    reviews: _makeToJson @review
+    impls: @_makeToJson @impls
+    reviews: @_makeToJson @review
   }
   @fromJson: (json, playerView1) ->
     newView = new PlayerView2 playerView1
@@ -166,9 +166,9 @@ Module.PlayerView2 = class PlayerView2
     newView.impls = json.impls
     for key, mapitem of newView.impls
       for keykey of mapitem
-        mapitem[keykey] = Implmementation.fromJson mapitem[keykey], functions, players
+        mapitem[keykey] = Implementation.fromJson mapitem[keykey], functions, players
     newView.reviews = json.reviews
     for key, mapitem of newView.reviews
       for keykey of mapitem
         mapitem[keykey] = ImplReviewSet.fromJson mapitem[keykey], newView.impls, players
-
+    newView

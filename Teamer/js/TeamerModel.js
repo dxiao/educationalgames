@@ -402,13 +402,13 @@
 
     PlayerView2.prototype.toJson = function() {
       return {
-        impls: _makeToJson(this.impls),
-        reviews: _makeToJson(this.review)
+        impls: this._makeToJson(this.impls),
+        reviews: this._makeToJson(this.review)
       };
     };
 
     PlayerView2.fromJson = function(json, playerView1) {
-      var functions, key, keykey, mapitem, newView, players, _ref, _ref1, _results;
+      var functions, key, keykey, mapitem, newView, players, _ref, _ref1;
       newView = new PlayerView2(playerView1);
       functions = newView.functions;
       players = newView.game.players;
@@ -417,24 +417,18 @@
       for (key in _ref) {
         mapitem = _ref[key];
         for (keykey in mapitem) {
-          mapitem[keykey] = Implmementation.fromJson(mapitem[keykey], functions, players);
+          mapitem[keykey] = Implementation.fromJson(mapitem[keykey], functions, players);
         }
       }
       newView.reviews = json.reviews;
       _ref1 = newView.reviews;
-      _results = [];
       for (key in _ref1) {
         mapitem = _ref1[key];
-        _results.push((function() {
-          var _results1;
-          _results1 = [];
-          for (keykey in mapitem) {
-            _results1.push(mapitem[keykey] = ImplReviewSet.fromJson(mapitem[keykey], newView.impls, players));
-          }
-          return _results1;
-        })());
+        for (keykey in mapitem) {
+          mapitem[keykey] = ImplReviewSet.fromJson(mapitem[keykey], newView.impls, players);
+        }
       }
-      return _results;
+      return newView;
     };
 
     return PlayerView2;

@@ -14,43 +14,59 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-sm-3 side-bar">
-      <ul class="list-group">
-        <li class="list-group-item" ng-repeat="impl in view.impls" ng-click="openImpl(impl)"
-            ng-class="{active: activeImpl == impl}">
-          {{ impl.function.name }}
-          <span class='pull-right glyphicon glyphicon-unchecked' ng-if="impl._dirty === undefined"></span>
-          <span class='pull-right glyphicon glyphicon-check' ng-if="impl._dirty === false"></span>
-          <span class='pull-right glyphicon glyphicon-edit' ng-if="impl._dirty === true"></span>
-        </li>
-      </ul>
+      <div ng-if="stage === 1">
+        <ul class="list-group">
+          <li class="list-group-item" ng-repeat="impl in view.impls" ng-click="openImpl(impl)"
+              ng-class="{active: activeImpl == impl}">
+            {{ impl.function.name }}
+            <span class='pull-right glyphicon glyphicon-unchecked' ng-if="impl._dirty === undefined"></span>
+            <span class='pull-right glyphicon glyphicon-check' ng-if="impl._dirty === false"></span>
+            <span class='pull-right glyphicon glyphicon-edit' ng-if="impl._dirty === true"></span>
+          </li>
+        </ul>
+      </div> 
+      <div ng-if="stage === 2">
+        Stage 2!
+      </div>
     </div>
     <div class="col-sm-9" role="main">
-      <div ng-if="activeImpl">
-        <h1>{{ activeImpl.function.name }}</h1>
-        <p class="family-description">{{ activeImpl.function.family.description }}</p>
-        <p>{{ activeImpl.function.description }}</p>
-        <form ng-submit="submitImpl()">
-          <div class="form-group">
-            <div function-editor></div>
-            <button type="submit" class="btn btn-success">Submit!</button>
-          </div>
-        </form>
+      <div ng-if="stage === 0">
+        ...loading stage 1...
       </div>
-      <div ng-show="info" class="alert alert-success">
-        {{ info }}
+      <div ng-if="stage === 1">
+        <div ng-if="activeImpl">
+          <h1>{{ activeImpl.function.name }}</h1>
+          <p class="family-description">{{ activeImpl.function.family.description }}</p>
+          <p>{{ activeImpl.function.description }}</p>
+          <form ng-submit="submitImpl()">
+            <div class="form-group">
+              <div function-editor></div>
+              <button type="submit" class="btn btn-success">Submit!</button>
+            </div>
+          </form>
+        </div>
+        <div ng-show="info" class="alert alert-success">
+          {{ info }}
+        </div>
+        <div ng-show="error" class="alert alert-danger">
+          {{ error }}
+        </div>
+        <div ng-hide="activeImpl">
+          <h2>Welcome to stage 1!</h2>
+          <p>
+          You have 20 minutes to code as the three functions listed to the left as well as you can.
+          In stage 2, you'll have a chance to review your code in comparison with others, and
+          in stage 3, you'll be able to use your and others' code to create a much large function.
+          Good luck!
+          </p>
+        </div>
       </div>
-      <div ng-show="error" class="alert alert-danger">
-        {{ error }}
+      <div ng-if="stage === 1.5">
+        ...loading stage 2...
       </div>
-    </div>
-    <div ng-hide="activeImpl">
-      <h2>Welcome to stage 1!</h2>
-      <p>
-      You have 20 minutes to code as the three functions listed to the left as well as you can.
-      In stage 2, you'll have a chance to review your code in comparison with others, and
-      in stage 3, you'll be able to use your and others' code to create a much large function.
-      Good luck!
-      </p>
+      <div ng-if="stage === 2">
+        Stage 2!
+      </div>
     </div>
   </div>
 </div>

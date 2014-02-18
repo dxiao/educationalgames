@@ -79,6 +79,27 @@
       });
     };
 
+    ProblemServer.prototype.getView2 = function() {
+      return this.http({
+        method: 'GET',
+        url: '/teamerapi/game/' + this.problem + '/getView2',
+        params: {
+          id: this.id
+        }
+      });
+    };
+
+    ProblemServer.prototype.getGameInfo = function() {
+      this.updateConfig();
+      return this.http({
+        method: 'GET',
+        url: '/teamerapi/game/' + this.problem + '/getGameInfo',
+        params: {
+          id: this.id
+        }
+      });
+    };
+
     ProblemServer.prototype.joinGame = function() {
       this.updateConfig();
       return this.http({
@@ -137,19 +158,49 @@
       }
     }
   ]).controller('ProblemController', [
-    '$scope', 'playerAuth', 'problemServer', function($scope, playerAuth, server) {
+    '$scope', 'playerAuth', 'problemServer', '$timeout', function($scope, playerAuth, server, $timeout) {
+      var endStageOne, startStageTwo;
       if (!playerAuth.assertLoggedIn()) {
         return;
       }
+      $scope.stage = 0;
       server.joinGame().then(function(data) {
         $scope.game = Model.GameInfo.fromJson(data.data);
         return server.getView();
       }).then(function(data) {
         $scope.view = Model.PlayerView.fromJson(data.data, $scope.game);
-        return $scope.view.createImplsForStage(1);
+        $scope.view.createImplsForStage(1);
+        console.log($scope.game.status.endTime - Date.now());
+        $scope.stageEndTimer = $timeout((function() {
+          return endStageOne();
+        }), $scope.game.status.endTime - Date.now());
+        return $scope.stage = 1;
       })["catch"](function(error) {
         return $scope.error = error;
       });
+      endStageOne = function() {
+        var $stageEndTimer;
+        console.log("PROBCTL: end stage one");
+        $scope.stage = 1.5;
+        $stageEndTimer = $timeout((function() {
+          return startStageTwo();
+        }), 5000);
+        return $scope.game.status.endTime = Date.now() + 5000;
+      };
+      startStageTwo = function() {
+        console.log("PROBCTL: start stage two");
+        return server.getGameInfo().then(function(data) {
+          $scope.game = Model.GameInfo.fromJson(data.data);
+          return server.getView2();
+        }).then(function(data) {
+          console.log(data.data);
+          $scope.view2 = Model.PlayerView2.fromJson(data.data, $scope.view);
+          console.log($scope.view2);
+          return $scope.stage = 2;
+        })["catch"](function(error) {
+          return $scope.error = error;
+        });
+      };
       $scope.openImpl = function(impl) {
         console.log("PROBCTL: changing function to " + impl["function"].name);
         return $scope.activeImpl = impl;

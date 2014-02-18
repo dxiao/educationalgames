@@ -53,6 +53,21 @@ class ProblemServer
       params: {id: @id}
     }
 
+  getView2: () ->
+    @http {
+      method: 'GET'
+      url: '/teamerapi/game/' + @problem + '/getView2'
+      params: {id: @id}
+    }
+
+  getGameInfo: () ->
+    @updateConfig()
+    @http {
+      method: 'GET'
+      url: '/teamerapi/game/' + @problem + '/getGameInfo'
+      params: {id: @id}
+    }
+
   joinGame: () ->
     @updateConfig()
     @http {
@@ -103,11 +118,14 @@ angular.module 'teamer', ['ngRoute']
       $location.path "/problem/sql/"
   ]
 
-  .controller 'ProblemController', ['$scope', 'playerAuth', 'problemServer',
-  ($scope, playerAuth, server) ->
+  .controller 'ProblemController', ['$scope', 'playerAuth', 'problemServer', '$timeout',
+  ($scope, playerAuth, server, $timeout) ->
     unless playerAuth.assertLoggedIn()
       return
 
+    $scope.stage = 0
+
+    #startStageOne() ->
     server.joinGame()
     .then (data) ->
       $scope.game = Model.GameInfo.fromJson data.data
@@ -115,8 +133,32 @@ angular.module 'teamer', ['ngRoute']
     .then (data) ->
       $scope.view = Model.PlayerView.fromJson data.data, $scope.game
       $scope.view.createImplsForStage 1
+      console.log $scope.game.status.endTime - Date.now()
+      $scope.stageEndTimer = $timeout((() -> endStageOne()), $scope.game.status.endTime - Date.now())
+      $scope.stage = 1
     .catch (error) ->
       $scope.error = error
+
+    endStageOne = () ->
+      console.log "PROBCTL: end stage one"
+      $scope.stage = 1.5
+      $stageEndTimer = $timeout((() -> startStageTwo()), 5000)
+      $scope.game.status.endTime = Date.now() + 5000
+
+    startStageTwo = () ->
+      console.log "PROBCTL: start stage two"
+      server.getGameInfo()
+      .then (data) ->
+        $scope.game = Model.GameInfo.fromJson data.data
+        server.getView2()
+      .then (data) ->
+        console.log data.data
+        $scope.view2 = Model.PlayerView2.fromJson data.data, $scope.view
+        console.log $scope.view2
+        $scope.stage = 2
+      .catch (error) ->
+        $scope.error = error
+
 
     $scope.openImpl = (impl) ->
       console.log "PROBCTL: changing function to " + impl.function.name
