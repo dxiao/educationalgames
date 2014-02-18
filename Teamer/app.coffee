@@ -97,11 +97,30 @@ angular.module 'teamer', ['ngRoute']
       $scope.info = data.data
       $scope.ProblemStage = "Stage 1"
       $scope.ProblemName = server.problem
+      $scope.stageEndTime = data.data.gameStatus.stageEnd
       server.getFunctions()
     .then (data) ->
       $scope.functions = data.data
     .catch (error) ->
       $scope.error = error
+  ]
+
+  .directive 'countdownTimer', ['dateFilter', '$interval'
+  (dateFilter, $interval) ->
+    format = "m:ss 'Remaining'"
+    (scope, element, attrs) ->
+      stageEndTime = 0
+      updateTime = () ->
+        element.text dateFilter stageEndTime - Date.now(), format
+
+      scope.$watch attrs.countdownTimer, (value) ->
+        stageEndTime = value
+        updateTime()
+
+      timer = $interval updateTime, 1000
+
+      element.bind '$destroy', () ->
+        $interval.cancel timer
   ]
 
   .service 'playerAuth', PlayerAuth

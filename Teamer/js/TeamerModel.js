@@ -132,13 +132,13 @@
   })();
 
   Module.GameStatus = GameStatus = (function() {
-    function GameStatus(gameStage, timeRemaining) {
+    function GameStatus(gameStage, stageEnd) {
       this.gameStage = gameStage;
-      this.timeRemaining = timeRemaining;
+      this.stageEnd = stageEnd;
     }
 
     GameStatus.fromJson = function(json) {
-      return new GameStatus(json.gameStage, json.timeRemaining);
+      return new GameStatus(json.gameStage, json.stageEnd);
     };
 
     return GameStatus;

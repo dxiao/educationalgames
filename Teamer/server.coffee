@@ -37,6 +37,7 @@ problems = {}
 problems.sql = require("./problems/sql.coffee").suite
 
 FUNCS_PER_PLAYER = 3
+STAGE_ONE_TIME = 1000 * 30 # 30 seconds
 
 class PlayerRegistry
   constructor: () ->
@@ -62,6 +63,7 @@ class Game
     @players = {} # id -> GamePlayer
     @impls = {} # problem -> implementation
     @stage = 0
+    @stageEndTime = Date.now() + STAGE_ONE_TIME
     @stageOneAssigner = new FairAssigner (value for i, value of @problem.functions)
   addPlayer: (player) ->
     if player.id of @players
@@ -70,7 +72,7 @@ class Game
     newPlayer.functions = newPlayer.functions.concat @stageOneAssigner.assign FUNCS_PER_PLAYER
     @players[player.id] = newPlayer
   getStatus: () ->
-    return new Model.GameStatus @stage, 10
+    return new Model.GameStatus @stage, @stageEndTime
   getInfo: () ->
     return new Model.GameInfo @problem.name, @getStatus(), @problem.families
 

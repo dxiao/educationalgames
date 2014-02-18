@@ -56,9 +56,9 @@ Module.GameInfo = class GameInfo
       json.families
 
 Module.GameStatus = class GameStatus
-  constructor: (@gameStage, @timeRemaining) ->
+  constructor: (@gameStage, @stageEnd) ->
   @fromJson: (json) ->
-    return new GameStatus json.gameStage, json.timeRemaining
+    return new GameStatus json.gameStage, json.stageEnd
     
 # User Information
 

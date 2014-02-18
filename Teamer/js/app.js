@@ -124,12 +124,33 @@
         $scope.info = data.data;
         $scope.ProblemStage = "Stage 1";
         $scope.ProblemName = server.problem;
+        $scope.stageEndTime = data.data.gameStatus.stageEnd;
         return server.getFunctions();
       }).then(function(data) {
         return $scope.functions = data.data;
       })["catch"](function(error) {
         return $scope.error = error;
       });
+    }
+  ]).directive('countdownTimer', [
+    'dateFilter', '$interval', function(dateFilter, $interval) {
+      var format;
+      format = "m:ss 'Remaining'";
+      return function(scope, element, attrs) {
+        var stageEndTime, timer, updateTime;
+        stageEndTime = 0;
+        updateTime = function() {
+          return element.text(dateFilter(stageEndTime - Date.now(), format));
+        };
+        scope.$watch(attrs.countdownTimer, function(value) {
+          stageEndTime = value;
+          return updateTime();
+        });
+        timer = $interval(updateTime, 1000);
+        return element.bind('$destroy', function() {
+          return $interval.cancel(timer);
+        });
+      };
     }
   ]).service('playerAuth', PlayerAuth).service('problemServer', ProblemServer);
 
