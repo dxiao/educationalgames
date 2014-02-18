@@ -7,7 +7,7 @@ if module? and module.exports?
 Module.suite = suite = new Model.ProblemSuite "sqlSuite"
 
 treeFunctions = new Model.FunctionFamily "tree", 1,
-  "For these problems, assume an object called a TreeNode, defined so:\n" +
+  "For this problem, assume a class called TreeNode, defined so:\n" +
   "  class TreeNode:\n" +
   "    index: index of the value stored at this node.\n" +
   "    value: datum stored at this node.\n" +
@@ -29,8 +29,8 @@ treeInOrder = new Model.Function "inOrder", treeFunctions,
   "Return a list of elements in the tree in order of ascending index"
 
 ioProblems = new Model.FunctionFamily "io", 1,
-  "For these problems, assume you are writing an input/output module for a " +
-  "small in-house database program. Commands are given to the module in " +
+  "For this problem, assume you are writing an input/output module for a " +
+  "small in-house database program.\n Commands are given to the module in " +
   "the form of SQL-like commands."
 
 parseSelect = new Model.Function "parseSelect", ioProblems,
@@ -42,9 +42,10 @@ parseInsert = new Model.Function "parseInsert", ioProblems,
   "and value which is asking to be inserted"
 
 printValues = new Model.Function "printValues", ioProblems,
-  "Given a list of indeces and values, print the indices and values like so:\n" +
-  "  1 bcd\n" +
-  "  3 foobar\n" +
+  "Given a list of numbers and values, print the numbers and values in a pretty way.\n" +
+  "One way might print the values like so:\n" +
+  "  1  bcd\n" +
+  "  3  foobar\n" +
   "  11 alice"
 
 # phase 2

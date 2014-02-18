@@ -41,7 +41,7 @@ FUNCS_PER_PLAYER = 3
 IMPLS_PER_FUNC = 3
 STAGE_TIMES = [0
                #1000 * 60 * 21,
-               1000 * 20,
+               1000 * 60 * 21,
                1000 * 60 * 16,
                1000 * 60 * 21]
 
@@ -233,6 +233,7 @@ Module.useExpressServer = (app) ->
   app.post "/teamerapi/game/:game/submitImpl", (req, res) ->
     [player, game] = getPlayerAndGame req, res
     unless player? then return
+    console.log req.body
     error = game.setImpl Model.Implementation.fromJson req.body, game.problem.functions, game.players
     if error?
       res.send 403, error
