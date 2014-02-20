@@ -7,7 +7,7 @@ if module? and module.exports?
 Module.suite = suite = new Model.ProblemSuite "sqlSuite"
 
 treeFunctions = new Model.FunctionFamily "tree", 1,
-  "For this problem, assume a class called TreeNode, defined so:\n" +
+  "For this problem, assume binary tree class called TreeNode, defined so:\n" +
   "  class TreeNode:\n" +
   "    index: index of the value stored at this node.\n" +
   "    value: datum stored at this node.\n" +
@@ -17,7 +17,7 @@ treeFunctions = new Model.FunctionFamily "tree", 1,
   "are all larger than this node's index.\n"
 
 treeInsert = new Model.Function "insert", treeFunctions,
-  "Given an element and its index, insert the element into the tree"
+  "Given a tree, an element and index, insert the element into the tree using the specified index"
 
 treeFindSize = new Model.Function "findSize", treeFunctions,
   "Find the current size of the tree rooted at the given node"
