@@ -133,9 +133,9 @@ angular.module 'teamer', ['ngRoute']
     .then (data) ->
       $scope.view = Model.PlayerView.fromJson data.data, $scope.game
       $scope.view.createImplsForStage 1
-      console.log $scope.game.status.endTime - Date.now()
       $scope.stageEndTimer = $timeout((() -> endStageOne()), $scope.game.status.endTime - Date.now())
       $scope.stage = 1
+      console.log "PROBCTL: start stage one"
     .catch (error) ->
       $scope.error = error
 
@@ -152,9 +152,7 @@ angular.module 'teamer', ['ngRoute']
         $scope.game = Model.GameInfo.fromJson data.data
         server.getView2()
       .then (data) ->
-        console.log data.data
         $scope.view2 = Model.PlayerView2.fromJson data.data, $scope.view
-        console.log $scope.view2
         $scope.stage = 2
       .catch (error) ->
         $scope.error = error
@@ -163,6 +161,10 @@ angular.module 'teamer', ['ngRoute']
     $scope.openImpl = (impl) ->
       console.log "PROBCTL: changing function to " + impl.function.name
       $scope.activeImpl = impl
+
+    $scope.openReview = (review) ->
+      console.log "PROBCTL: changing review to " + review.impl.function.name
+      $scope.activeReview = review
 
     $scope.codeEditor = {}
 

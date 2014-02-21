@@ -23,10 +23,20 @@ Module.assert = (condition, message) ->
 Module.pad = (str, num, char) ->
   char = " " unless char?
   len = (str + "").length
-  return str + (if num > len then Module.repeatStr(char, num - len) else "")
+  str + (if num > len then Module.repeatStr(char, num - len) else "")
 
 Module.repeatStr = (str, count) ->
-  return (str for i in [0...count]).join("")
+  (str for i in [0...count]).join("")
 
 Module.randInt = (min, max) ->
-  return Math.floor Math.random()*(max-min) - min
+  Math.floor Math.random()*(max-min) - min
+
+Module.mapToList = (map, additionalDepth) ->
+  result = []
+  if additionalDepth > 0
+    for key, val of map
+      result = result.concat Module.mapToList val, additionalDepth-1
+  else
+    for key, val of map
+      result.push val
+  result

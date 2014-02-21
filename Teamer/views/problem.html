@@ -26,7 +26,15 @@
         </ul>
       </div> 
       <div ng-if="stage === 2">
-        Stage 2!
+        <ul class="list-group">
+          <li class="list-group-item" ng-repeat="review in view2.getReviewList()" 
+              ng-click="openReview(review)" ng-class="{active: activeReview == review}">
+            {{ review.impl.function.name }}
+            <span class='pull-right glyphicon glyphicon-unchecked' ng-if="review._dirty === undefined"></span>
+            <span class='pull-right glyphicon glyphicon-check' ng-if="review._dirty === false"></span>
+            <span class='pull-right glyphicon glyphicon-edit' ng-if="review._dirty === true"></span>
+          </li>
+        </ul>
       </div>
     </div>
     <div class="col-sm-9" role="main">
@@ -34,6 +42,15 @@
         ...loading stage 1...
       </div>
       <div ng-if="stage === 1">
+        <div ng-hide="activeImpl">
+          <h2>Welcome to stage 1!</h2>
+          <p>
+          You have 20 minutes to code as the three functions listed to the left as well as you can.
+          In stage 2, you'll have a chance to review your code in comparison with others, and
+          in stage 3, you'll be able to use your and others' code to create a much large function.
+          Good luck!
+          </p>
+        </div>
         <div ng-if="activeImpl">
           <h1>{{ activeImpl.function.name }}</h1>
           <p class="family-description">{{ activeImpl.function.family.description }}</p>
@@ -51,8 +68,38 @@
         <div ng-show="error" class="alert alert-danger">
           {{ error }}
         </div>
+      </div>
+      <div ng-if="stage === 1.5">
+        ...loading stage 2...
+      </div>
+      <div ng-if="stage === 2">
+        <div ng-hide="activeReview">
+          <h2>Welcome to stage 2!</h2>
+          <p>
+          You have 15 minutes to go through and review your code as compared to up to three other's
+          implementations of the same function. You can upvote their implementation if you
+          particularly like their submission. Or you could downvote it, if you think it's no good.
+          Either way, you should also leave written comments so others can see your reasoning.
+          </p>
+        </div>
+        <div ng-if="activeReview">
+          <h1>{{ activeReview.impl.function.name }}</h1>
+          <p class="family-description">{{ activeReview.impl.function.family.description }}</p>
+          <p class="function-description">{{ activeReview.impl.function.description }}</p>
+          <form ng-submit="submitReview()">
+            <div class="form-group">
+              <div function-editor></div>
+            </div>
+          </form>
+        </div>
+        <div ng-show="info" class="alert alert-success">
+          {{ info }}
+        </div>
+        <div ng-show="error" class="alert alert-danger">
+          {{ error }}
+        </div>
         <div ng-hide="activeImpl">
-          <h2>Welcome to stage 1!</h2>
+          <h2>Welcome to stage 2!</h2>
           <p>
           You have 20 minutes to code as the three functions listed to the left as well as you can.
           In stage 2, you'll have a chance to review your code in comparison with others, and
@@ -60,12 +107,6 @@
           Good luck!
           </p>
         </div>
-      </div>
-      <div ng-if="stage === 1.5">
-        ...loading stage 2...
-      </div>
-      <div ng-if="stage === 2">
-        Stage 2!
       </div>
     </div>
   </div>

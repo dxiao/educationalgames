@@ -30,22 +30,12 @@ Utils = require "./utils.coffee"
 # submitFunction(token, function, impl)
 # //Stage 2:
 # getImplementations(token, problem)
-# 
 
-# ------------- Model ----------------
-
-problems = {}
-problems.sql = require("./problems/sql.coffee").suite
-
-FUNCS_PER_PLAYER = 3
-IMPLS_PER_FUNC = 3
-STAGE_TIMES = [0
-               #1000 * 60 * 21,
-               1000 * 60 * 21,
-               1000 * 60 * 16,
-               1000 * 60 * 21]
+SAVE_STATE = false
 
 saveState = (label) ->
+  unless SAVE_STATE
+    return
   saveJson = (obj, label) ->
     #console.log obj
     fs.writeFileSync 'state-' + Date.now() + '-' + label + '.json',  obj
@@ -57,6 +47,17 @@ saveState = (label) ->
     getPlayerAndGame: getPlayerAndGame
   }), label
 
+# ------------- Model ----------------
+
+problems = {}
+problems.sql = require("./problems/sql.coffee").suite
+
+FUNCS_PER_PLAYER = 3
+IMPLS_PER_FUNC = 3
+STAGE_TIMES = [0
+               1000 * 15,
+               1000 * 60 * 16,
+               1000 * 60 * 21]
 
 class PlayerRegistry
   constructor: () ->
@@ -83,7 +84,7 @@ class Game
     @playerViews = {} # id -> PlayerView
     @playerView2s = {} # id -> PlayerView2
     @impls = {} # func -> player -> implementation
-    @reviews = {} # func -> player -> implementation
+    @reviews = {} # func -> player -> implreviweset
     for name, func of @problem.functions
       @impls[name] = {}
       @reviews[name] = {}

@@ -400,10 +400,14 @@
       return mapmapjson;
     };
 
+    PlayerView2.prototype.getReviewList = function() {
+      return _.mapToList(this.reviews, 1);
+    };
+
     PlayerView2.prototype.toJson = function() {
       return {
         impls: this._makeToJson(this.impls),
-        reviews: this._makeToJson(this.review)
+        reviews: this._makeToJson(this.reviews)
       };
     };
 

@@ -7,3 +7,9 @@ Need people to learn software engineering principles
 2 Phase game
 Possible extensions larger phases
 
+
+Have a demo - three functions leading to the next capstone
+
+Poster idea - sequence 
+
+[] Add confirmation that people are ready for the next stage

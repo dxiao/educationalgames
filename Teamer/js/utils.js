@@ -58,6 +58,23 @@
     return Math.floor(Math.random() * (max - min) - min);
   };
 
+  Module.mapToList = function(map, additionalDepth) {
+    var key, result, val;
+    result = [];
+    if (additionalDepth > 0) {
+      for (key in map) {
+        val = map[key];
+        result = result.concat(Module.mapToList(val, additionalDepth - 1));
+      }
+    } else {
+      for (key in map) {
+        val = map[key];
+        result.push(val);
+      }
+    }
+    return result;
+  };
+
 }).call(this);
 
 //# sourceMappingURL=utils.map

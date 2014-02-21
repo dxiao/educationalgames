@@ -170,11 +170,11 @@
       }).then(function(data) {
         $scope.view = Model.PlayerView.fromJson(data.data, $scope.game);
         $scope.view.createImplsForStage(1);
-        console.log($scope.game.status.endTime - Date.now());
         $scope.stageEndTimer = $timeout((function() {
           return endStageOne();
         }), $scope.game.status.endTime - Date.now());
-        return $scope.stage = 1;
+        $scope.stage = 1;
+        return console.log("PROBCTL: start stage one");
       })["catch"](function(error) {
         return $scope.error = error;
       });
@@ -193,9 +193,7 @@
           $scope.game = Model.GameInfo.fromJson(data.data);
           return server.getView2();
         }).then(function(data) {
-          console.log(data.data);
           $scope.view2 = Model.PlayerView2.fromJson(data.data, $scope.view);
-          console.log($scope.view2);
           return $scope.stage = 2;
         })["catch"](function(error) {
           return $scope.error = error;
@@ -204,6 +202,10 @@
       $scope.openImpl = function(impl) {
         console.log("PROBCTL: changing function to " + impl["function"].name);
         return $scope.activeImpl = impl;
+      };
+      $scope.openReview = function(review) {
+        console.log("PROBCTL: changing review to " + review.impl["function"].name);
+        return $scope.activeReview = review;
       };
       $scope.codeEditor = {};
       return $scope.submitImpl = function() {

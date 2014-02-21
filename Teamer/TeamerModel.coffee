@@ -147,6 +147,7 @@ Module.PlayerView2 = class PlayerView2
       @functions[func.name] = func
       @impls[func.name] = {}
       @reviews[func.name] = {}
+
   _makeToJson: (mapmapitem) ->
     mapmapjson = {}
     for key, mapitem of mapmapitem
@@ -155,9 +156,13 @@ Module.PlayerView2 = class PlayerView2
         mapjson[keykey] = item.toJson()
       mapmapjson[key] = mapjson
     mapmapjson
+
+  getReviewList: () ->
+    _.mapToList @reviews, 1
+
   toJson: () -> {
     impls: @_makeToJson @impls
-    reviews: @_makeToJson @review
+    reviews: @_makeToJson @reviews
   }
   @fromJson: (json, playerView1) ->
     newView = new PlayerView2 playerView1
