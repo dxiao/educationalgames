@@ -57,7 +57,7 @@
           <p class="function-description">{{ activeImpl.function.description }}</p>
           <form ng-submit="submitImpl()">
             <div class="form-group">
-              <div function-editor></div>
+              <function-editor function="activeImpl"></function-editor>
               <button type="submit" class="btn btn-success">Submit!</button>
             </div>
           </form>
@@ -88,7 +88,7 @@
           <p class="function-description">{{ activeReview.impl.function.description }}</p>
           <form ng-submit="submitReview()">
             <div class="form-group">
-              <div function-editor></div>
+              <function-editor function="activeReview.impl" readonly></function-editor>
             </div>
           </form>
         </div>

@@ -240,24 +240,29 @@
       };
     }
   ]).directive('functionEditor', function() {
-    return function(scope, element, attrs) {
-      var editor;
-      editor = CodeMirror(element[0], {
-        value: "use strict;",
-        mode: "javascript",
-        lineNumbers: true
-      });
-      scope.codeEditor.editor = editor;
-      scope.$watch('activeImpl', function(value) {
-        if (!value.code) {
-          value.code = "//Add your implementation (and documentation) here!\n";
-        }
-        editor.setValue(value.code);
-        return scope.activeImpl._dirty = true;
-      });
-      return editor.on("change", function() {
-        return scope.activeImpl._dirty = true;
-      });
+    return {
+      restrict: "E",
+      link: function(scope, element, attrs) {
+        var editor, readonly;
+        readonly = attrs.readonly != null ? "nocursor" : false;
+        editor = CodeMirror(element[0], {
+          value: "use strict;",
+          mode: "javascript",
+          lineNumbers: true,
+          readOnly: readonly
+        });
+        scope.codeEditor.editor = editor;
+        scope.$watch(attrs["function"], function(value) {
+          if (!value.code) {
+            value.code = "//Add your implementation (and documentation) here!\n";
+          }
+          editor.setValue(value.code);
+          return scope.activeImpl._dirty = true;
+        });
+        return editor.on("change", function() {
+          return scope.activeImpl._dirty = true;
+        });
+      }
     };
   }).service('playerAuth', PlayerAuth).service('problemServer', ProblemServer);
 

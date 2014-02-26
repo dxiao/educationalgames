@@ -197,21 +197,25 @@ angular.module 'teamer', ['ngRoute']
         $interval.cancel timer
   ]
 
-  .directive 'functionEditor', () ->
-    (scope, element, attrs) ->
+  .directive 'functionEditor', () -> {
+    restrict: "E"
+    link: (scope, element, attrs) ->
+      readonly = if attrs.readonly? then "nocursor" else false
       editor = CodeMirror element[0], {
         value: "use strict;"
         mode: "javascript"
         lineNumbers: true
+        readOnly: readonly
       }
       scope.codeEditor.editor = editor
-      scope.$watch 'activeImpl', (value) ->
+      scope.$watch attrs.function, (value) ->
         unless value.code
           value.code = "//Add your implementation (and documentation) here!\n"
         editor.setValue value.code
         scope.activeImpl._dirty = true
       editor.on "change", () ->
         scope.activeImpl._dirty = true
+  }
 
   .service 'playerAuth', PlayerAuth
   .service 'problemServer', ProblemServer
