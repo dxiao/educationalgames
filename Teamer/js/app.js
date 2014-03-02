@@ -164,6 +164,7 @@
         return;
       }
       $scope.stage = 0;
+      $scope.userName = playerAuth.player.name;
       server.joinGame().then(function(data) {
         $scope.game = Model.GameInfo.fromJson(data.data);
         return server.getView();
@@ -205,6 +206,7 @@
       };
       $scope.openReview = function(review) {
         console.log("PROBCTL: changing review to " + review.impl["function"].name);
+        console.log(review);
         return $scope.activeReview = review;
       };
       $scope.codeEditor = {};
@@ -254,7 +256,7 @@
         scope.codeEditor.editor = editor;
         scope.$watch(attrs["function"], function(value) {
           if (!value.code) {
-            value.code = "//Add your implementation (and documentation) here!\n";
+            value.code = "//Add your implementation (and documentation) here!\n\n\n\n\n";
           }
           editor.setValue(value.code);
           return scope.activeImpl._dirty = true;

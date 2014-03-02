@@ -51,11 +51,12 @@ saveState = (label) ->
 
 problems = {}
 problems.sql = require("./problems/sql.coffee").suite
+problems.sqlite = require("./problems/sqlite.coffee").suite
 
 FUNCS_PER_PLAYER = 3
 IMPLS_PER_FUNC = 3
 STAGE_TIMES = [0
-               1000 * 15,
+               1000 * 30,
                1000 * 60 * 16,
                1000 * 60 * 21]
 
@@ -127,9 +128,9 @@ class Game
       @convertPlayerViewToStage2 newPlayerView
 
   convertPlayerViewToStage2: (playerView) ->
-    pid = playerView.player.id
+    id = playerView.player.id
     newPlayerView = new Model.PlayerView2 playerView
-    console.log "player " + pid
+    console.log "player " + id
     for fid, func of newPlayerView.functions
       console.log "  function " + fid
       impls = @stageTwoAssigners[fid].assign IMPLS_PER_FUNC
@@ -141,7 +142,7 @@ class Game
         reviewMap[pid] = @reviews[fid][pid]
       newPlayerView.impls[fid] = implMap
       newPlayerView.reviews[fid] = reviewMap
-    @playerView2s[pid] = newPlayerView
+    @playerView2s[id] = newPlayerView
 
   getStatus: () ->
     return new Model.GameStatus @stage, @stageEndTime
@@ -185,7 +186,7 @@ class FairAssigner
       assignment.push @itemsLeft.splice(n, 1)[0]
     return assignment
 
-game = new Game problems.sql
+game = new Game problems.sqlite
 gameList = { sql: game}
 
 # ------------- Server ---------------

@@ -4,8 +4,8 @@
       <span class="navbar-brand active">Team Programming!</span>
     </div>
 
-    <p class="navbar-text">{{ game.name }}</p>
-    <p class="navbar-text">{{ game.status.stage }}</p>
+    <p class="navbar-text">{{ userName }}</p>
+    <p class="navbar-text">Stage {{ game.status.stage }}</p>
 
     <div class="navbar-right navbar-text" countdown-timer="game.status.endTime"></div>
   </div>
@@ -29,7 +29,7 @@
         <ul class="list-group">
           <li class="list-group-item" ng-repeat="review in view2.getReviewList()" 
               ng-click="openReview(review)" ng-class="{active: activeReview == review}">
-            {{ review.impl.function.name }}
+            {{ review.impl.player.name }}'s {{ review.impl.function.name }}
             <span class='pull-right glyphicon glyphicon-unchecked' ng-if="review._dirty === undefined"></span>
             <span class='pull-right glyphicon glyphicon-check' ng-if="review._dirty === false"></span>
             <span class='pull-right glyphicon glyphicon-edit' ng-if="review._dirty === true"></span>
@@ -83,7 +83,7 @@
           </p>
         </div>
         <div ng-if="activeReview">
-          <h1>{{ activeReview.impl.function.name }}</h1>
+          <h1>{{ activeReview.impl.player.name }}'s {{ activeReview.impl.function.name }}</h1>
           <p class="family-description">{{ activeReview.impl.function.family.description }}</p>
           <p class="function-description">{{ activeReview.impl.function.description }}</p>
           <form ng-submit="submitReview()">

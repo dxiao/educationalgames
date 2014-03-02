@@ -124,6 +124,7 @@ angular.module 'teamer', ['ngRoute']
       return
 
     $scope.stage = 0
+    $scope.userName = playerAuth.player.name
 
     #startStageOne() ->
     server.joinGame()
@@ -157,13 +158,13 @@ angular.module 'teamer', ['ngRoute']
       .catch (error) ->
         $scope.error = error
 
-
     $scope.openImpl = (impl) ->
       console.log "PROBCTL: changing function to " + impl.function.name
       $scope.activeImpl = impl
 
     $scope.openReview = (review) ->
       console.log "PROBCTL: changing review to " + review.impl.function.name
+      console.log review
       $scope.activeReview = review
 
     $scope.codeEditor = {}
@@ -210,7 +211,7 @@ angular.module 'teamer', ['ngRoute']
       scope.codeEditor.editor = editor
       scope.$watch attrs.function, (value) ->
         unless value.code
-          value.code = "//Add your implementation (and documentation) here!\n"
+          value.code = "//Add your implementation (and documentation) here!\n\n\n\n\n"
         editor.setValue value.code
         scope.activeImpl._dirty = true
       editor.on "change", () ->
