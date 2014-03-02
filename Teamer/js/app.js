@@ -164,7 +164,8 @@
         return;
       }
       $scope.stage = 0;
-      $scope.userName = playerAuth.player.name;
+      $scope.playerName = playerAuth.player.name;
+      $scope.playerId = playerAuth.player.id;
       server.joinGame().then(function(data) {
         $scope.game = Model.GameInfo.fromJson(data.data);
         return server.getView();
@@ -191,7 +192,7 @@
       startStageTwo = function() {
         console.log("PROBCTL: start stage two");
         return server.getGameInfo().then(function(data) {
-          $scope.game = Model.GameInfo.fromJson(data.data);
+          $scope.game.mergeJson(data.data);
           return server.getView2();
         }).then(function(data) {
           $scope.view2 = Model.PlayerView2.fromJson(data.data, $scope.view);
@@ -204,10 +205,22 @@
         console.log("PROBCTL: changing function to " + impl["function"].name);
         return $scope.activeImpl = impl;
       };
-      $scope.openReview = function(review) {
-        console.log("PROBCTL: changing review to " + review.impl["function"].name);
-        console.log(review);
-        return $scope.activeReview = review;
+      $scope.openReview = function(reviewSet) {
+        var i, review, _i, _len, _ref;
+        console.log("PROBCTL: changing reviewSet to " + reviewSet.impl["function"].name);
+        console.log(reviewSet);
+        $scope.activeReviewSet = reviewSet;
+        _ref = reviewSet.reviews;
+        for (review = _i = 0, _len = _ref.length; _i < _len; review = ++_i) {
+          i = _ref[review];
+          if (review.player.id === $scope.playerId) {
+            $scope.activeReview = review;
+            break;
+          }
+        }
+        if ($scope.activeReview == null) {
+          return $scope.activeReview = new Model.ImplReview(reviewSet.impl, $scope.playerId);
+        }
       };
       $scope.codeEditor = {};
       return $scope.submitImpl = function() {

@@ -126,6 +126,12 @@
       this.player = player;
       this.rating = rating;
       this.comment = comment;
+      if (this.rating == null) {
+        this.rating = 0;
+      }
+      if (this.comment == null) {
+        this.comment = "";
+      }
     }
 
     ImplReview.prototype.toJson = function() {
@@ -150,10 +156,10 @@
       this.impl = impl;
       this.reviews = reviews;
       this.rating = rating;
-      if (!this.rating) {
+      if (this.rating == null) {
         this.rating = new ImplRating(0, 0);
       }
-      if (!this.reviews) {
+      if (this.reviews == null) {
         this.reviews = [];
       }
     }
@@ -244,6 +250,29 @@
         families[id] = FunctionFamily.fromJson(family);
       }
       return new GameInfo(json.name, GameStatus.fromJson(json.status), families, players);
+    };
+
+    GameInfo.prototype.mergeJson = function(json) {
+      var family, id, player, _ref, _ref1, _results;
+      this.status = GameStatus.fromJson(json.status);
+      _ref = json.families;
+      for (id in _ref) {
+        family = _ref[id];
+        if (!(id in this.families)) {
+          this.families[id] = FunctionFamily.fromJson(family);
+        }
+      }
+      _ref1 = json.players;
+      _results = [];
+      for (id in _ref1) {
+        player = _ref1[id];
+        if (!(id in this.players)) {
+          _results.push(this.players[id] = Player.fromJson(player));
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
     };
 
     return GameInfo;

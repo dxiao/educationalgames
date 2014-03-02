@@ -55,6 +55,8 @@ Module.Implementation = class Implementation
 
 Module.ImplReview = class ImplReview
   constructor: (@impl, @player, @rating, @comment) ->
+    unless @rating? then @rating = 0
+    unless @comment? then  @comment = ""
   toJson: () -> {
     impl: @impl.toShortJson()
     player: @player.id
@@ -67,9 +69,9 @@ Module.ImplReview = class ImplReview
 
 Module.ImplReviewSet = class ImplReviewSet
   constructor: (@impl, @reviews, @rating) ->
-    unless @rating
+    unless @rating?
       @rating = new ImplRating(0, 0)
-    unless @reviews
+    unless @reviews?
       @reviews = []
   toJson: () -> {
     impl: @impl.toShortJson()
@@ -103,6 +105,14 @@ Module.GameInfo = class GameInfo
     for id, family of json.families
       families[id] = FunctionFamily.fromJson family
     new GameInfo json.name, GameStatus.fromJson(json.status), families, players
+  mergeJson: (json) ->
+    @status = GameStatus.fromJson(json.status)
+    for id, family of json.families
+      unless id of @families
+        @families[id] = FunctionFamily.fromJson family
+    for id, player of json.players
+      unless id of @players
+        @players[id] = Player.fromJson player
 
 Module.GameStatus = class GameStatus
   constructor: (@stage, @endTime) ->

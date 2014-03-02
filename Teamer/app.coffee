@@ -124,7 +124,8 @@ angular.module 'teamer', ['ngRoute']
       return
 
     $scope.stage = 0
-    $scope.userName = playerAuth.player.name
+    $scope.playerName = playerAuth.player.name
+    $scope.playerId = playerAuth.player.id
 
     #startStageOne() ->
     server.joinGame()
@@ -150,7 +151,7 @@ angular.module 'teamer', ['ngRoute']
       console.log "PROBCTL: start stage two"
       server.getGameInfo()
       .then (data) ->
-        $scope.game = Model.GameInfo.fromJson data.data
+        $scope.game.mergeJson data.data
         server.getView2()
       .then (data) ->
         $scope.view2 = Model.PlayerView2.fromJson data.data, $scope.view
@@ -162,10 +163,16 @@ angular.module 'teamer', ['ngRoute']
       console.log "PROBCTL: changing function to " + impl.function.name
       $scope.activeImpl = impl
 
-    $scope.openReview = (review) ->
-      console.log "PROBCTL: changing review to " + review.impl.function.name
-      console.log review
-      $scope.activeReview = review
+    $scope.openReview = (reviewSet) ->
+      console.log "PROBCTL: changing reviewSet to " + reviewSet.impl.function.name
+      console.log reviewSet
+      $scope.activeReviewSet = reviewSet
+      for i, review in reviewSet.reviews
+        if review.player.id == $scope.playerId
+          $scope.activeReview = review
+          break
+      if not $scope.activeReview?
+        $scope.activeReview = new Model.ImplReview reviewSet.impl, $scope.playerId
 
     $scope.codeEditor = {}
 

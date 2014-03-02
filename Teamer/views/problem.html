@@ -4,7 +4,7 @@
       <span class="navbar-brand active">Team Programming!</span>
     </div>
 
-    <p class="navbar-text">{{ userName }}</p>
+    <p class="navbar-text">{{ playerName }}</p>
     <p class="navbar-text">Stage {{ game.status.stage }}</p>
 
     <div class="navbar-right navbar-text" countdown-timer="game.status.endTime"></div>
@@ -73,7 +73,7 @@
         ...loading stage 2...
       </div>
       <div ng-if="stage === 2">
-        <div ng-hide="activeReview">
+        <div ng-hide="activeReviewSet">
           <h2>Welcome to stage 2!</h2>
           <p>
           You have 15 minutes to go through and review your code as compared to up to three other's
@@ -82,13 +82,32 @@
           Either way, you should also leave written comments so others can see your reasoning.
           </p>
         </div>
-        <div ng-if="activeReview">
-          <h1>{{ activeReview.impl.player.name }}'s {{ activeReview.impl.function.name }}</h1>
-          <p class="family-description">{{ activeReview.impl.function.family.description }}</p>
-          <p class="function-description">{{ activeReview.impl.function.description }}</p>
+        <div ng-if="activeReviewSet">
+          <h1>{{ activeReviewSet.impl.function.name }}</h1>
+          <p class="family-description">{{ activeReviewSet.impl.function.family.description }}</p>
+          <p class="function-description">{{ activeReviewSet.impl.function.description }}</p>
+          <h3>{{ activeReviewSet.impl.player.name }}'s Solution:</h3>
+          <function-editor function="activeReviewSet.impl" readonly></function-editor>
           <form ng-submit="submitReview()">
             <div class="form-group">
-              <function-editor function="activeReview.impl" readonly></function-editor>
+              <label>What do you think?</label>
+              <textarea class="form-control" rows="3" name="review" ng-model="activeReview.comment">Put your thoughts here!</textarea>
+              <label class="checkbox">
+                <input type="radio" ng-model="activeReview.rating" value="1">
+                  I recommend this implementation!
+                </input>
+              </label>
+              <label class="checkbox">
+                <input type="radio" ng-model="activeReview.rating" value="0" checked>
+                  This implementation is ok.
+                </input>
+              </label>
+              <label class="checkbox">
+                <input type="radio" ng-model="activeReview.rating" value="-1">
+                  Do not use this implementation!
+                </input>
+              </label>
+              <button type="submit" class="btn btn-success">Save!</button>
             </div>
           </form>
         </div>
