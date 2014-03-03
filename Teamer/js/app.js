@@ -122,6 +122,17 @@
       });
     };
 
+    ProblemServer.prototype.submitReview = function(review) {
+      return this.http({
+        method: 'POST',
+        url: '/teamerapi/game/' + this.problem + '/submitReview',
+        params: {
+          id: this.id
+        },
+        data: review.toJson()
+      });
+    };
+
     return ProblemServer;
 
   })();
@@ -164,8 +175,7 @@
         return;
       }
       $scope.stage = 0;
-      $scope.playerName = playerAuth.player.name;
-      $scope.playerId = playerAuth.player.id;
+      $scope.player = playerAuth.player;
       server.joinGame().then(function(data) {
         $scope.game = Model.GameInfo.fromJson(data.data);
         return server.getView();
@@ -206,29 +216,44 @@
         return $scope.activeImpl = impl;
       };
       $scope.openReview = function(reviewSet) {
-        var i, review, _i, _len, _ref;
+        var found, review, _i, _len, _ref;
         console.log("PROBCTL: changing reviewSet to " + reviewSet.impl["function"].name);
-        console.log(reviewSet);
         $scope.activeReviewSet = reviewSet;
+        found = false;
         _ref = reviewSet.reviews;
-        for (review = _i = 0, _len = _ref.length; _i < _len; review = ++_i) {
-          i = _ref[review];
-          if (review.player.id === $scope.playerId) {
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          review = _ref[_i];
+          if (review.player.id === $scope.player.id) {
             $scope.activeReview = review;
+            console.log("Found previous review");
+            found = true;
             break;
           }
         }
-        if ($scope.activeReview == null) {
-          return $scope.activeReview = new Model.ImplReview(reviewSet.impl, $scope.playerId);
+        if (!found) {
+          console.log("Making new review");
+          $scope.activeReview = new Model.ImplReview(reviewSet.impl, $scope.player);
+          return reviewSet.reviews.push($scope.activeReview);
         }
       };
       $scope.codeEditor = {};
-      return $scope.submitImpl = function() {
+      $scope.submitImpl = function() {
         $scope.activeImpl.code = $scope.codeEditor.editor.getValue();
         console.log("PROBCTL: submitting implementation for " + $scope.activeImpl["function"].name);
         return server.submitImpl($scope.activeImpl).then(function(data) {
           $scope.info = data.data;
           return $scope.activeImpl._dirty = false;
+        })["catch"](function(error) {
+          return $scope.error = error;
+        });
+      };
+      return $scope.submitReview = function() {
+        console.log("PROBCTL: submitting review for " + $scope.activeReview.impl["function"].name);
+        console.log($scope);
+        return server.submitReview($scope.activeReview).then(function(data) {
+          $scope.activeReview._dirty = false;
+          $scope.activeReviewSet.mergeJson(data.data, $scope.view2.impls, $scope.game.players);
+          return console.log($scope.activeReviewSet);
         })["catch"](function(error) {
           return $scope.error = error;
         });
@@ -276,6 +301,20 @@
         });
         return editor.on("change", function() {
           return scope.activeImpl._dirty = true;
+        });
+      }
+    };
+  }).directive('reviewView', function() {
+    return {
+      link: function(scope, element, attrs) {
+        return scope.$watch("review.rating", function(value) {
+          if (value === "0") {
+            return element.addClass("alert-info").removeClass("alert-success").removeClass("alert-danger");
+          } else if (value === "1") {
+            return element.addClass("alert-success").removeClass("alert-info").removeClass("alert-danger");
+          } else if (value === "-1") {
+            return element.addClass("alert-danger").removeClass("alert-info").removeClass("alert-success");
+          }
         });
       }
     };

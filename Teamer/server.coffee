@@ -65,7 +65,7 @@ class PlayerRegistry
     @players = {} # id -> player
   getNextUnusedId: () ->
     loop
-      newId = Math.floor Math.random()*1000000
+      newId = (Math.floor Math.random()*1000000) + ""
       unless newId in @players
         return newId
   createNewPlayer: (name) ->
@@ -166,6 +166,13 @@ class Game
     @reviews[fid][pid] = new Model.ImplReviewSet newImpl
     return
 
+  updateReviewSets: (review) ->
+    pid = review.impl.player.id
+    fid = review.impl.function.name
+    reviewSet = @reviews[fid][pid]
+    console.log reviewSet
+    reviewSet.addOrUpdateReview review
+
 class FairAssigner
   constructor: (@items) ->
     if @items.length <= 0
@@ -241,6 +248,17 @@ Module.useExpressServer = (app) ->
       res.send 403, error
     else
       res.send 200
+
+  app.post "/teamerapi/game/:game/submitReview", (req, res) ->
+    [player, game] = getPlayerAndGame req, res
+    unless player? then return
+    review = Model.ImplReview.fromJson req.body, game.impls, game.players
+    console.log review
+    success = game.updateReviewSets review
+    if success
+      res.send game.reviews[review.impl.function.name][review.impl.player.id].toJson()
+    else
+      res.send 403, success
 
   app.get "/teamerapi/game/:game/getFunctions", (req, res) ->
     [player, game] = getPlayerAndGame req, res

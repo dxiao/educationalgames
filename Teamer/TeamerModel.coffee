@@ -57,6 +57,9 @@ Module.ImplReview = class ImplReview
   constructor: (@impl, @player, @rating, @comment) ->
     unless @rating? then @rating = 0
     unless @comment? then  @comment = ""
+  mergeReview: (review) ->
+    @rating = review.rating
+    @comment = review.comment
   toJson: () -> {
     impl: @impl.toShortJson()
     player: @player.id
@@ -65,7 +68,7 @@ Module.ImplReview = class ImplReview
   }
   @fromJson: (json, funcToImplList, players) ->
     new ImplReview funcToImplList[json.impl.func][json.impl.player],
-      players[json.player], json.rating, json.comment
+      players[json.player], parseInt(json.rating), json.comment
 
 Module.ImplReviewSet = class ImplReviewSet
   constructor: (@impl, @reviews, @rating) ->
@@ -73,6 +76,31 @@ Module.ImplReviewSet = class ImplReviewSet
       @rating = new ImplRating(0, 0)
     unless @reviews?
       @reviews = []
+
+  addOrUpdateReview: (newReview) ->
+    if newReview.impl != @impl
+      console.log "ERROR: review not for this set!"
+      return
+    for review in @reviews
+      if review.player.id == newReview.player.id
+        review.mergeReview newReview
+        @rating.num += newReview.rating - review.rating
+        return review
+    @reviews.push newReview
+    @rating.addRating newReview.rating
+    @updateRating()
+    newReview
+    
+  updateRating: () ->
+    @rating.clear()
+    for review in @reviews
+      @rating.addRating review.rating
+
+  mergeJson: (json, funcToImplList, players) ->
+    for reviewJson in json.reviews
+      @addOrUpdateReview ImplReview.fromJson reviewJson, funcToImplList, players
+    @
+
   toJson: () -> {
     impl: @impl.toShortJson()
     reviews: (review.toJson() for review in @reviews)
@@ -88,9 +116,12 @@ Module.ImplRating = class ImplRating
   addRating: (rating) ->
     @num += rating
     @denom += 1
+  clear: () ->
+    @num = 0
+    @denom = 0
   toJson: () -> @
   @fromJson: (json) ->
-    new ImplRating json.num, json.denom
+    new ImplRating parseInt(json.num), parseInt(json.denom)
 
 # Problem State
 

@@ -84,6 +84,14 @@ class ProblemServer
       data: impl.toJson()
     }
 
+  submitReview: (review) ->
+    @http {
+      method: 'POST'
+      url: '/teamerapi/game/' + @problem + '/submitReview'
+      params: {id: @id}
+      data: review.toJson()
+    }
+
 angular.module 'teamer', ['ngRoute']
   .config ($routeProvider, $locationProvider) ->
     $routeProvider
@@ -124,8 +132,7 @@ angular.module 'teamer', ['ngRoute']
       return
 
     $scope.stage = 0
-    $scope.playerName = playerAuth.player.name
-    $scope.playerId = playerAuth.player.id
+    $scope.player = playerAuth.player
 
     #startStageOne() ->
     server.joinGame()
@@ -165,14 +172,18 @@ angular.module 'teamer', ['ngRoute']
 
     $scope.openReview = (reviewSet) ->
       console.log "PROBCTL: changing reviewSet to " + reviewSet.impl.function.name
-      console.log reviewSet
       $scope.activeReviewSet = reviewSet
-      for i, review in reviewSet.reviews
-        if review.player.id == $scope.playerId
+      found = false
+      for review in reviewSet.reviews
+        if review.player.id == $scope.player.id
           $scope.activeReview = review
+          console.log "Found previous review"
+          found = true
           break
-      if not $scope.activeReview?
-        $scope.activeReview = new Model.ImplReview reviewSet.impl, $scope.playerId
+      if not found
+        console.log "Making new review"
+        $scope.activeReview = new Model.ImplReview reviewSet.impl, $scope.player
+        reviewSet.reviews.push $scope.activeReview
 
     $scope.codeEditor = {}
 
@@ -183,6 +194,17 @@ angular.module 'teamer', ['ngRoute']
       .then (data) ->
         $scope.info = data.data
         $scope.activeImpl._dirty = false
+      .catch (error) ->
+        $scope.error = error
+
+    $scope.submitReview = () ->
+      console.log "PROBCTL: submitting review for " + $scope.activeReview.impl.function.name
+      console.log $scope
+      server.submitReview $scope.activeReview
+      .then (data) ->
+        $scope.activeReview._dirty = false
+        $scope.activeReviewSet.mergeJson data.data, $scope.view2.impls, $scope.game.players
+        console.log $scope.activeReviewSet
       .catch (error) ->
         $scope.error = error
   ]
@@ -223,6 +245,24 @@ angular.module 'teamer', ['ngRoute']
         scope.activeImpl._dirty = true
       editor.on "change", () ->
         scope.activeImpl._dirty = true
+  }
+
+  .directive 'reviewView', () -> {
+    #templateUrl: "teamer/partials/reviewView.html"
+    link: (scope, element, attrs) ->
+      scope.$watch "review.rating", (value) ->
+        if value == "0"
+          element.addClass "alert-info"
+            .removeClass "alert-success"
+            .removeClass "alert-danger"
+        else if value == "1"
+          element.addClass "alert-success"
+            .removeClass "alert-info"
+            .removeClass "alert-danger"
+        else if value == "-1"
+          element.addClass "alert-danger"
+            .removeClass "alert-info"
+            .removeClass "alert-success"
   }
 
   .service 'playerAuth', PlayerAuth

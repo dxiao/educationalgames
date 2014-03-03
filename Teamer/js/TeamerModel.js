@@ -134,6 +134,11 @@
       }
     }
 
+    ImplReview.prototype.mergeReview = function(review) {
+      this.rating = review.rating;
+      return this.comment = review.comment;
+    };
+
     ImplReview.prototype.toJson = function() {
       return {
         impl: this.impl.toShortJson(),
@@ -144,7 +149,7 @@
     };
 
     ImplReview.fromJson = function(json, funcToImplList, players) {
-      return new ImplReview(funcToImplList[json.impl.func][json.impl.player], players[json.player], json.rating, json.comment);
+      return new ImplReview(funcToImplList[json.impl.func][json.impl.player], players[json.player], parseInt(json.rating), json.comment);
     };
 
     return ImplReview;
@@ -163,6 +168,49 @@
         this.reviews = [];
       }
     }
+
+    ImplReviewSet.prototype.addOrUpdateReview = function(newReview) {
+      var review, _i, _len, _ref;
+      if (newReview.impl !== this.impl) {
+        console.log("ERROR: review not for this set!");
+        return;
+      }
+      _ref = this.reviews;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        review = _ref[_i];
+        if (review.player.id === newReview.player.id) {
+          review.mergeReview(newReview);
+          this.rating.num += newReview.rating - review.rating;
+          return review;
+        }
+      }
+      this.reviews.push(newReview);
+      this.rating.addRating(newReview.rating);
+      this.updateRating();
+      return newReview;
+    };
+
+    ImplReviewSet.prototype.updateRating = function() {
+      var review, _i, _len, _ref, _results;
+      this.rating.clear();
+      _ref = this.reviews;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        review = _ref[_i];
+        _results.push(this.rating.addRating(review.rating));
+      }
+      return _results;
+    };
+
+    ImplReviewSet.prototype.mergeJson = function(json, funcToImplList, players) {
+      var reviewJson, _i, _len, _ref;
+      _ref = json.reviews;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        reviewJson = _ref[_i];
+        this.addOrUpdateReview(ImplReview.fromJson(reviewJson, funcToImplList, players));
+      }
+      return this;
+    };
 
     ImplReviewSet.prototype.toJson = function() {
       var review;
@@ -211,12 +259,17 @@
       return this.denom += 1;
     };
 
+    ImplRating.prototype.clear = function() {
+      this.num = 0;
+      return this.denom = 0;
+    };
+
     ImplRating.prototype.toJson = function() {
       return this;
     };
 
     ImplRating.fromJson = function(json) {
-      return new ImplRating(json.num, json.denom);
+      return new ImplRating(parseInt(json.num), parseInt(json.denom));
     };
 
     return ImplRating;

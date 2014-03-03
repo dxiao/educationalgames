@@ -4,7 +4,7 @@
       <span class="navbar-brand active">Team Programming!</span>
     </div>
 
-    <p class="navbar-text">{{ playerName }}</p>
+    <p class="navbar-text">{{ player.name }}</p>
     <p class="navbar-text">Stage {{ game.status.stage }}</p>
 
     <div class="navbar-right navbar-text" countdown-timer="game.status.endTime"></div>
@@ -88,13 +88,18 @@
           <p class="function-description">{{ activeReviewSet.impl.function.description }}</p>
           <h3>{{ activeReviewSet.impl.player.name }}'s Solution:</h3>
           <function-editor function="activeReviewSet.impl" readonly></function-editor>
+          <div review-view class="alert" ng-hide="review.player.id == player.id"
+              ng-repeat="review in activeReviewSet.reviews">
+            <label style="display: block">{{ review.player.name }}'s thoughts:</label>
+            {{ review.comment }}
+          </div>
           <form ng-submit="submitReview()">
             <div class="form-group">
               <label>What do you think?</label>
               <textarea class="form-control" rows="3" name="review" ng-model="activeReview.comment">Put your thoughts here!</textarea>
               <label class="checkbox">
                 <input type="radio" ng-model="activeReview.rating" value="1">
-                  I recommend this implementation!
+                  I like this implementation!
                 </input>
               </label>
               <label class="checkbox">
@@ -104,7 +109,7 @@
               </label>
               <label class="checkbox">
                 <input type="radio" ng-model="activeReview.rating" value="-1">
-                  Do not use this implementation!
+                  I dislike this implementation.
                 </input>
               </label>
               <button type="submit" class="btn btn-success">Save!</button>
