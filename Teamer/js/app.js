@@ -168,6 +168,16 @@
         return $location.path("/problem/sql/");
       }
     }
+  ]).controller('Prototype', [
+    '$scope', function($scope) {
+      $scope.activeImpl = {
+        code: "public static String[] anagrams(String word, String[] WORDLIST) {\n" + "    return ff3_filter(f3b_deduplicate(f4a_permute(word)), WORDLIST);\n" + "}"
+      };
+      $scope.activeReview = {
+        code: "// find all permutations of str and add the given prefix (use \"\")\n" + "public static void permute(String str, String prefix) {\n" + "    int n = str.length();\n" + "    if (n == 0) {\n" + "        System.out.println(prefix);\n" + "    } else {\n" + "        for (int i = 0; i < n; i++) {\n" + "            permute(str.substring(0, i) + str.substring(i+1, n), prefix + str.charAt(i));\n" + "        }\n" + "    }\n" + "}"
+      };
+      return $scope.codeEditor = {};
+    }
   ]).controller('ProblemController', [
     '$scope', 'playerAuth', 'problemServer', '$timeout', function($scope, playerAuth, server, $timeout) {
       var endStageOne, startStageTwo;
@@ -287,7 +297,7 @@
         readonly = attrs.readonly != null ? "nocursor" : false;
         editor = CodeMirror(element[0], {
           value: "use strict;",
-          mode: "javascript",
+          mode: "text/x-java",
           lineNumbers: true,
           readOnly: readonly
         });

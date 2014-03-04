@@ -48,6 +48,11 @@ printValues = new Model.Function "printValues", ioProblems,
   "  3  foobar\n" +
   "  11 alice"
 
+permute = new Model.Function "permute", ioProblems,
+  "Given a string, generate all possible permutations of its characters.\n" +
+  "Duplicate permutations are allowed, but you can also filter them out..\n\n" +
+  'For example, permuting "Ban" would give ["Ban", "Bna", "aBn", "anB", "naB", "nBa"].'
+
 # phase 2
 
 finalProblems = new Model.FunctionFamily "final", 2,
@@ -61,6 +66,6 @@ sqlServer = new Model.Function "sqlserver", finalProblems,
   "Given a SQL-like command in the following forms and a tree-based database, " +
   "do the command against the database, and return the result."
 
-suite.addFamilies treeFunctions, finalProblems
-suite.addFunctions treeInOrder, treeFindSize, treeInsert,
+suite.addFamilies treeFunctions, finalProblems, ioProblems
+suite.addFunctions treeInOrder, treeFindSize, permute,
   treeNthLargest, sqlServer

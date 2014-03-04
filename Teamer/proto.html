@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html ng-app="teamer">
+  <head>
+    <title>Team Programming!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="/common/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="/common/js/jquery-2.1.0.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <link href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet">
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/common/js/bootstrap.min.js"></script>
+    <!-- Less -->
+    <link href="/teamer/less/style.less" rel="stylesheet/less" type="text/css" />
+    <script src="/common/js/less.min.js"></script>
+    <!-- Angular -->
+    <script src="/common/js/angular.min.js"></script>
+    <script src="/common/js/angular-route.min.js"></script>
+    <!-- Ace -->
+    <script src="/common/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+    <!-- CodeMirror -->
+    <script src="/common/codemirror/lib/codemirror.js"></script>
+    <script src="/common/codemirror/mode/javascript/javascript.js"></script>
+    <script src="/common/codemirror/mode/clike/clike.js"></script>
+    <link href="/common/codemirror/lib/codemirror.css" rel="stylesheet"></script>
+
+    <script src="/teamer/js/utils.js"></script>
+    <script src="/teamer/js/TeamerModel.js"></script>
+    <script src="/teamer/js/app.js"></script>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div ng-controller="Prototype">
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <span class="navbar-brand active">Team Programming!</span>
+    </div>
+
+    <p class="navbar-text">Bob</p>
+    <p class="navbar-text">Stage 3</p>
+
+    <div class="navbar-right navbar-text">13:59 Remaining</div>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-3 side-bar">
+      <div>
+        <ul class="list-group">
+          <li class="list-group-item active">
+            anagrams
+            <span class='pull-right glyphicon glyphicon-edit'></span>
+          </li>
+          <li class="list-group-item">
+            crossword
+            <span class='pull-right glyphicon glyphicon-unchecked'></span>
+          </li>
+        </ul>
+      </div> 
+      <label>Functions from Stage 1:</label>
+      <div>
+        <ul class="list-group">
+          <li class="list-group-item"> Eve's dedup <span class="badge">2/3</span></li>
+          <li class="list-group-item"> Alice's permute  <span class="badge">1/2</span></li>
+          <li class="list-group-item"> Alices's filter  <span class="badge">2/5</span></li>
+          <li class="list-group-item active"> Bob's permute  <span class="badge">1/3</span></li>
+          <li class="list-group-item"> Alice's inOrder <span class="badge">0/3</span> </li>
+          <li class="list-group-item"> Bob's findSize  <span class="badge">0/3</span></li>
+          <li class="list-group-item"> Bob's inOrder  <span class="badge">-1/3</span></li>
+          <li class="list-group-item"> Eve's findSize  <span class="badge">-2/3</span></li>
+        </ul>
+      </div> 
+    </div>
+    <div class="col-sm-9" role="main">
+      <div>
+        <div>
+          <h1>anagrams</h1>
+          <p class="family-description">For these problems, you can use any submissions to the previous rounds you
+want. Just double click on the function to insert it into your code!.</p>
+          <p class="function-description">Given a String, return all anagrams of that string which are in the given
+public static String[] WORDLIST.</p>
+          <form ng-submit="submitImpl()">
+            <div class="form-group">
+              <function-editor function="activeImpl"></function-editor>
+              <button type="submit" class="btn btn-success">Save!</button>
+            </div>
+          </form>
+        </div>
+        <div ng-show="info" class="alert alert-success">
+          {{ info }}
+        </div>
+        <div ng-show="error" class="alert alert-danger">
+          {{ error }}
+        </div>
+      </div>
+        <div class="border">
+          <h3>Bob's permute (1/3)</h3>
+          <p class="function-description">Given a string, generate all possible permutations of its characters.
+Duplicate permutations are allowed, but you can also filter them out.</p>
+          <function-editor function="activeReview" readonly></function-editor>
+          <div class="alert alert-warning">
+            <label style="display: block">Alice's thoughts:</label>
+            It would have been better if you overloaded the method so we didn't have to give a blank prefix each time. Also, return a list instead of printing to screen?
+          </div>
+          <div class="alert alert-success">
+            <label style="display: block">Eve's thoughts:</label>
+            Does everything it's supposed to, and a lot better than mine!
+          </div>
+          <div class="alert alert-warning">
+            <label style="display: block">Charlie's thoughts:</label>
+            I don't get it - how does this function work? Can you be more clear?
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+    </div>
+  </body>
+</html>
