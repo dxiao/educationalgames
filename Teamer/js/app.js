@@ -192,11 +192,15 @@
       }).then(function(data) {
         $scope.view = Model.PlayerView.fromJson(data.data, $scope.game);
         $scope.view.createImplsForStage(1);
-        $scope.stageEndTimer = $timeout((function() {
-          return endStageOne();
-        }), $scope.game.status.endTime - Date.now());
         $scope.stage = 1;
-        return console.log("PROBCTL: start stage one");
+        console.log("PROBCTL: start stage one");
+        if ($scope.game.status.stage === 1) {
+          return $scope.stageEndTimer = $timeout((function() {
+            return endStageOne();
+          }), $scope.game.status.endTime - Date.now());
+        } else {
+          return endStageOne();
+        }
       })["catch"](function(error) {
         return $scope.error = error;
       });

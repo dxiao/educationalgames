@@ -165,9 +165,12 @@ angular.module 'teamer', ['ngRoute']
     .then (data) ->
       $scope.view = Model.PlayerView.fromJson data.data, $scope.game
       $scope.view.createImplsForStage 1
-      $scope.stageEndTimer = $timeout((() -> endStageOne()), $scope.game.status.endTime - Date.now())
       $scope.stage = 1
       console.log "PROBCTL: start stage one"
+      if $scope.game.status.stage == 1
+        $scope.stageEndTimer = $timeout((() -> endStageOne()), $scope.game.status.endTime - Date.now())
+      else
+        endStageOne()
     .catch (error) ->
       $scope.error = error
 

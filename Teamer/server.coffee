@@ -56,7 +56,7 @@ problems.sqlite = require("./problems/sqlite.coffee").suite
 FUNCS_PER_PLAYER = 3
 IMPLS_PER_FUNC = 4
 STAGE_TIMES = [0
-               1000 * 90,
+               1000 * 30,
                1000 * 60 * 16,
                1000 * 60 * 21]
 
