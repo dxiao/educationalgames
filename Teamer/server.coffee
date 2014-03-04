@@ -134,6 +134,8 @@ class Game
     for fid, func of newPlayerView.functions
       console.log "  function " + fid
       impls = @stageTwoAssigners[fid].assign IMPLS_PER_FUNC
+      if impls.length == 0
+        continue
       implMap = {}
       reviewMap = {}
       for impl in impls
@@ -180,6 +182,8 @@ class FairAssigner
     @itemsLeft = @items.slice 0
   assign: (count) ->
     assignment = []
+    if @items.length == 0
+      return assignment
     for i in [0...count]
       if @itemsLeft.length == 0
         @itemsLeft = @items.slice 0
