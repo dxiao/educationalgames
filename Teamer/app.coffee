@@ -60,6 +60,13 @@ class ProblemServer
       params: {id: @id}
     }
 
+  getView2: () ->
+    @http {
+      method: 'GET'
+      url: '/teamerapi/game/' + @problem + '/getView3'
+      params: {id: @id}
+    }
+
   getGameInfo: () ->
     @updateConfig()
     @http {
@@ -158,6 +165,7 @@ angular.module 'teamer', ['ngRoute']
     $scope.player = playerAuth.player
 
     #startStageOne() ->
+    console.log "PROBCTL: start stage one"
     server.joinGame()
     .then (data) ->
       $scope.game = Model.GameInfo.fromJson data.data
@@ -166,7 +174,6 @@ angular.module 'teamer', ['ngRoute']
       $scope.view = Model.PlayerView.fromJson data.data, $scope.game
       $scope.view.createImplsForStage 1
       $scope.stage = 1
-      console.log "PROBCTL: start stage one"
       if $scope.game.status.stage == 1
         $scope.stageEndTimer = $timeout((() -> endStageOne()), $scope.game.status.endTime - Date.now())
       else
@@ -189,6 +196,29 @@ angular.module 'teamer', ['ngRoute']
       .then (data) ->
         $scope.view2 = Model.PlayerView2.fromJson data.data, $scope.view
         $scope.stage = 2
+        if $scope.game.status.stage == 2
+          $scope.stageEndTimer = $timeout((() -> endStageTwo()), $scope.game.status.endTime - Date.now())
+        else
+          endStageTwo()
+      .catch (error) ->
+        $scope.error = error
+
+    endStageTwo = () ->
+      console.log "PROBCTL: end stage two"
+      $scope.stage = 2.5
+      $stageEndTimer = $timeout((() -> startStageThree()), 5000)
+      $scope.game.status.endTime = Date.now() + 5000
+
+    startStageThree = () ->
+      console.log "PROBCTL: start stage three"
+      server.getGameInfo()
+      .then (data) ->
+        $scope.game.mergeJson data.data
+        server.getView3()
+      .then (data) ->
+        $scope.view3 = Model.PlayerView3.fromJson data.data, $scope.view
+        $scope.view.createImplForProgram()
+        $scope.stage = 3
       .catch (error) ->
         $scope.error = error
 

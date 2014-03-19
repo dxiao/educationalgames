@@ -13,3 +13,20 @@ Have a demo - three functions leading to the next capstone
 Poster idea - sequence 
 
 [] Add confirmation that people are ready for the next stage
+
+
+3/14
+
+put function signatures in sidebar
+arranging by function
+mechanism for reviewing problems
+
+sort reviews by +1/0/-1?
+also disply explicit +1/0/-1
+
+bring out problem statement
+bring functions screen all way to bottom
+
+allow solutions to change in 2?
+
+don't let Bob see Alice's reviews on Bob's code

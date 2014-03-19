@@ -50,7 +50,7 @@ printValues = new Model.Function "printValues", ioProblems,
 
 # phase 2
 
-finalProblems = new Model.FunctionFamily "final", 2,
+finalProblems = new Model.FunctionFamily "final", 3,
   "For these problems, you can use any submissions to the previous rounds you " +
   "want, as long as you give proper credit."
 

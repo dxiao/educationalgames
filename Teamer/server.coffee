@@ -53,10 +53,11 @@ problems = {}
 problems.sql = require("./problems/sql.coffee").suite
 problems.sqlite = require("./problems/sqlite.coffee").suite
 
+PROBS_PER_PLAYER = 1
 FUNCS_PER_PLAYER = 3
-IMPLS_PER_FUNC = 4
+IMPLS_PER_FUNC = 3
 STAGE_TIMES = [0
-               1000 * 30,
+               1000 * 60 * 5,
                1000 * 60 * 16,
                1000 * 60 * 21]
 
@@ -84,6 +85,7 @@ class Game
     @players = {} # id -> Player
     @playerViews = {} # id -> PlayerView
     @playerView2s = {} # id -> PlayerView2
+    @playerView3s = {} # id -> PlayerView3
     @impls = {} # func -> player -> implementation
     @reviews = {} # func -> player -> implreviweset
     for name, func of @problem.functions
@@ -96,13 +98,14 @@ class Game
   startNextStage: () ->
     @stage += 1
     @nextStageSetup()
-    @stageEndTime = Date.now() + STAGE_TIMES[@stage]
-    if @stageTimeout?
-      clearTimeout @stageTimeout
-    @stageTimeout = setTimeout (() => @startNextStage()), @stageEndTime - Date.now()
+    if @stage < STAGE_TIMES.length
+      @stageEndTime = Date.now() + STAGE_TIMES[@stage]
+      if @stageTimeout?
+        clearTimeout @stageTimeout
+      @stageTimeout = setTimeout (() => @startNextStage()), @stageEndTime - Date.now()
 
   setupStageOne: () ->
-    @stageOneAssigner = new FairAssigner (value for i, value of @problem.functions when value.stage == 1)
+    @stageOneAssigner = new FairAssigner @problem.getFunctionsForStage 1
     @nextStageSetup = @setupStageTwo
 
   setupStageTwo: () ->
@@ -115,7 +118,14 @@ class Game
     #for each player, convert view1 to view2
     for pid, playerView of @playerViews
       @convertPlayerViewToStage2 playerView
-    saveState "startStageTwo"
+    @nextStageSetup = @setupStageThree
+
+  setupStageThree: () ->
+    saveState "endStageTwo"
+    @stageThreeAssigner = new FairAssigner @problem.getFunctionsForStage 3
+    for pid, playerView2 of @playerViews2
+      @convertPlayerViewToStage3 playerView2
+    @nextStageSetup = () ->
 
   joinPlayer: (player) ->
     if player.id of @players
@@ -145,6 +155,29 @@ class Game
       newPlayerView.impls[fid] = implMap
       newPlayerView.reviews[fid] = reviewMap
     @playerView2s[id] = newPlayerView
+
+  convertPlayerViewToStage3: (playerView2) ->
+    id = playerView2.player.id
+    program = @stageThreeAssigner.assign PROBS_PER_PLAYER
+    newPlayerView = new Model.PlayerView3 playerView2, problem[0]
+    console.log "player " + id
+    for fid, func of @problem.getFunctionsForStage 1
+      if fid in newPlayerView.functions
+        continue
+      console.log "  function " + fid
+      impls = @stageTwoAssigners[fid].assign IMPLS_PER_FUNC
+      if impls.length == 0
+        continue
+      implMap = {}
+      reviewMap = {}
+      for impl in impls
+        pid = impl.player.id
+        implMap[pid] = impl
+        reviewMap[pid] = @reviews[fid][pid]
+      newPlayerView.impls[fid] = implMap
+      newPlayerView.reviews[fid] = reviewMap
+    @playerView3s[id] = newPlayerView
+    
 
   getStatus: () ->
     return new Model.GameStatus @stage, @stageEndTime
@@ -245,6 +278,11 @@ Module.useExpressServer = (app) ->
     [player, game] = getPlayerAndGame req, res
     unless player? then return
     res.json game.playerView2s[player.id].toJson()
+
+  app.get "/teamerapi/game/:game/getView3", (req, res) ->
+    [player, game] = getPlayerAndGame req, res
+    unless player? then return
+    res.json game.playerView3s[player.id].toJson()
 
   app.post "/teamerapi/game/:game/submitImpl", (req, res) ->
     [player, game] = getPlayerAndGame req, res

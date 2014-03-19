@@ -36,6 +36,9 @@ Module.ProblemSuite = class ProblemSuite
   addFamilies: (families...) ->
     for fam in families
       @families[fam.name] = fam
+  getFunctionsForStage: (stage) ->
+    (func for i, func of @functions when func.stage == stage)
+
 
 # Problem Submissions
 
@@ -218,3 +221,58 @@ Module.PlayerView2 = class PlayerView2
       for keykey of mapitem
         mapitem[keykey] = ImplReviewSet.fromJson mapitem[keykey], newView.impls, players
     newView
+
+Module.PlayerView3 = class PlayerView3
+  constructor: (playerView2, program) ->
+    @player = playerView2.player
+    @game = playerView2.game
+    @functions = playerView2.functions # id -> func
+    @impls = playerView2.impls # func -> player -> impl
+    @reviews = playerView2.reviews # func -> player -> review
+    @program = program
+  createImplForProgram: () ->
+    @progImpl = new Implementation @program, @player, ""
+
+  _makeToJson: (mapmapitem) ->
+    mapmapjson = {}
+    for key, mapitem of mapmapitem
+      mapjson = {}
+      for keykey, item of mapitem
+        mapjson[keykey] = item.toJson()
+      mapmapjson[key] = mapjson
+    mapmapjson
+
+  getReviewList: () ->
+    _.mapToList @reviews, 1
+
+  toJson: () ->
+    obj = {
+      functions: {}
+      impls: @_makeToJson @impls
+      reviews: @_makeToJson @reviews
+      program: @program.toJson()
+    }
+    for id, func in @functions
+      obj.functions[id] = func.toJson()
+    obj
+  @fromJson: (json, playerView2) ->
+    program = Function.fromJson json.program
+    newView = new PlayerView3 playerView2, program
+    functions = newView.functions
+    players = newView.game.players
+    for key, mapitem of json.impls
+      if key not in newView.impls
+        newView.impls[key] = {}
+      for keykey of mapitem
+        if keykey not in newView.impls[key]
+          newView.impls[key][keykey] = Implementation.fromJson json.impls[key][keykey], functions, players
+    for key, mapitem of json.reviews
+      if key not in newView.reviews
+        newView.reviews[key] = {}
+      for keykey, item of mapitem
+        if keykey in newView.reviews[key]
+          newView[key][keykey].mergeJson item, newView.impls, players
+        else
+          newView[key][keykey] = ImplReviewSet.fromJson mapitem[keykey], newView.impls, players
+    newView
+   
