@@ -36,6 +36,29 @@
           </li>
         </ul>
       </div>
+      <div ng-if="stage === 3">
+        <ul class="list-group">
+          <li class="list-group-item" ng-repeat="impl in view3.progImpls" ng-click="openImpl(impl)"
+              ng-class="{active: activeImpl == impl}">
+            {{ impl.function.name }}
+            <span class='pull-right glyphicon glyphicon-unchecked' ng-if="impl._dirty === undefined"></span>
+            <span class='pull-right glyphicon glyphicon-check' ng-if="impl._dirty === false"></span>
+            <span class='pull-right glyphicon glyphicon-edit' ng-if="impl._dirty === true"></span>
+          </li>
+        </ul>
+        <div>
+          <label>Functions from Stage 1:</label>
+          <ul class="list-group">
+            <li class="list-group-item" ng-repeat="review in view3.getReviewList()" 
+                ng-click="openReview(review)" ng-class="{active: activeReview == review}">
+              {{ review.impl.player.name }}'s {{ review.impl.function.name }}
+              <span class='pull-right glyphicon glyphicon-unchecked' ng-if="review._dirty === undefined"></span>
+              <span class='pull-right glyphicon glyphicon-check' ng-if="review._dirty === false"></span>
+              <span class='pull-right glyphicon glyphicon-edit' ng-if="review._dirty === true"></span>
+            </li>
+          </ul>
+        </div>
+      </div> 
     </div>
     <div class="col-sm-9" role="main">
       <div ng-if="stage === 0">
@@ -115,6 +138,43 @@
               <button type="submit" class="btn btn-success">Update</button>
             </div>
           </form>
+        </div>
+        <div ng-show="info" class="alert alert-success">
+          {{ info }}
+        </div>
+        <div ng-show="error" class="alert alert-danger">
+          {{ error }}
+        </div>
+      </div>
+      <div ng-if="stage === 2.5">
+        ...loading stage 3...
+      </div>
+      <div ng-if="stage === 3">
+        <div ng-hide="activeImpl">
+          <h2>Welcome to stage 3!</h2>
+        </div>
+        <div ng-if="activeImpl">
+          <h1>{{ activeImpl.function.name }}</h1>
+          <p class="family-description">{{ activeImpl.function.family.description }}</p>
+          <p class="function-description">{{ activeImpl.function.description }}</p>
+          <form ng-submit="submitImpl()">
+            <div class="form-group">
+              <function-editor function="activeImpl"></function-editor>
+              <button type="submit" class="btn btn-success">Save!</button>
+            </div>
+          </form>
+        </div>
+        <div ng-if="activeReviewSet">
+          <h1>{{ activeReviewSet.impl.function.name }}</h1>
+          <p class="family-description">{{ activeReviewSet.impl.function.family.description }}</p>
+          <p class="function-description">{{ activeReviewSet.impl.function.description }}</p>
+          <h3>{{ activeReviewSet.impl.player.name }}'s Solution:</h3>
+          <function-editor function="activeReviewSet.impl" readonly></function-editor>
+          <div review-view class="alert"
+              ng-repeat="review in activeReviewSet.reviews">
+            <label style="display: block">{{ review.player.name }}'s thoughts:</label>
+            {{ review.comment }}
+          </div>
         </div>
         <div ng-show="info" class="alert alert-success">
           {{ info }}

@@ -57,8 +57,8 @@ PROBS_PER_PLAYER = 1
 FUNCS_PER_PLAYER = 3
 IMPLS_PER_FUNC = 3
 STAGE_TIMES = [0
-               1000 * 60 * 5,
-               1000 * 60 * 16,
+               1000 * 15
+               1000 * 25
                1000 * 60 * 21]
 
 class PlayerRegistry
@@ -122,8 +122,9 @@ class Game
 
   setupStageThree: () ->
     saveState "endStageTwo"
+    console.log "endStageTwo"
     @stageThreeAssigner = new FairAssigner @problem.getFunctionsForStage 3
-    for pid, playerView2 of @playerViews2
+    for pid, playerView2 of @playerView2s
       @convertPlayerViewToStage3 playerView2
     @nextStageSetup = () ->
 
@@ -158,10 +159,11 @@ class Game
 
   convertPlayerViewToStage3: (playerView2) ->
     id = playerView2.player.id
-    program = @stageThreeAssigner.assign PROBS_PER_PLAYER
-    newPlayerView = new Model.PlayerView3 playerView2, problem[0]
+    programs = @stageThreeAssigner.assign PROBS_PER_PLAYER
+    newPlayerView = new Model.PlayerView3 playerView2, programs
     console.log "player " + id
-    for fid, func of @problem.getFunctionsForStage 1
+    for func in @problem.getFunctionsForStage 1
+      fid = func.name
       if fid in newPlayerView.functions
         continue
       console.log "  function " + fid
@@ -230,7 +232,7 @@ class FairAssigner
       assignment.push @itemsLeft.splice(n, 1)[0]
     return assignment
 
-game = new Game problems.sqlite
+game = new Game problems.sql
 gameList = { sql: game}
 
 # ------------- Server ---------------

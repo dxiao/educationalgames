@@ -60,7 +60,7 @@ class ProblemServer
       params: {id: @id}
     }
 
-  getView2: () ->
+  getView3: () ->
     @http {
       method: 'GET'
       url: '/teamerapi/game/' + @problem + '/getView3'
@@ -103,15 +103,15 @@ angular.module 'teamer', ['ngRoute']
   .config ($routeProvider, $locationProvider) ->
     $routeProvider
       .when '/login', {
-        templateUrl: 'teamer/views/login.html'
+        templateUrl: '/teamer/views/login.html'
         controller: 'LoginController'
       }
       .when '/problem/:problem', {
-        templateUrl: 'teamer/views/problem.html'
+        templateUrl: '/teamer/views/problem.html'
         controller: 'ProblemController'
       }
       .otherwise {
-        templateUrl: 'teamer/views/null.html'
+        templateUrl: '/teamer/views/null.html'
         controller: 'InitController'
       }
 
@@ -216,9 +216,11 @@ angular.module 'teamer', ['ngRoute']
         $scope.game.mergeJson data.data
         server.getView3()
       .then (data) ->
-        $scope.view3 = Model.PlayerView3.fromJson data.data, $scope.view
-        $scope.view.createImplForProgram()
+        $scope.view3 = Model.PlayerView3.fromJson data.data, $scope.view2
+        $scope.view3.createImplsForProgram()
         $scope.stage = 3
+        $scope.activeImpl = null
+        $scope.activeReview = null
       .catch (error) ->
         $scope.error = error
 

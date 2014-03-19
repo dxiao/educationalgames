@@ -536,17 +536,27 @@
   })();
 
   Module.PlayerView3 = PlayerView3 = (function() {
-    function PlayerView3(playerView2, program) {
+    function PlayerView3(playerView2, programs) {
       this.player = playerView2.player;
       this.game = playerView2.game;
       this.functions = playerView2.functions;
       this.impls = playerView2.impls;
       this.reviews = playerView2.reviews;
-      this.program = program;
+      this.programs = programs;
     }
 
-    PlayerView3.prototype.createImplForProgram = function() {
-      return this.progImpl = new Implementation(this.program, this.player, "");
+    PlayerView3.prototype.createImplsForProgram = function() {
+      var program;
+      return this.progImpls = (function() {
+        var _i, _len, _ref, _results;
+        _ref = this.programs;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          program = _ref[_i];
+          _results.push(new Implementation(program, this.player, ""));
+        }
+        return _results;
+      }).call(this);
     };
 
     PlayerView3.prototype._makeToJson = function(mapmapitem) {
@@ -569,12 +579,21 @@
     };
 
     PlayerView3.prototype.toJson = function() {
-      var func, id, obj, _i, _len, _ref;
+      var func, id, obj, program, _i, _len, _ref;
       obj = {
         functions: {},
         impls: this._makeToJson(this.impls),
         reviews: this._makeToJson(this.reviews),
-        program: this.program.toJson()
+        programs: (function() {
+          var _i, _len, _ref, _results;
+          _ref = this.programs;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            program = _ref[_i];
+            _results.push(program.toJson());
+          }
+          return _results;
+        }).call(this)
       };
       _ref = this.functions;
       for (func = _i = 0, _len = _ref.length; _i < _len; func = ++_i) {
@@ -585,11 +604,22 @@
     };
 
     PlayerView3.fromJson = function(json, playerView2) {
-      var functions, item, key, keykey, mapitem, newView, players, program, _ref, _ref1;
-      program = Function.fromJson(json.program);
-      newView = new PlayerView3(playerView2, program);
+      var functions, item, key, keykey, mapitem, newView, players, program, programs, _ref, _ref1;
+      programs = (function() {
+        var _i, _len, _ref, _results;
+        _ref = json.programs;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          program = _ref[_i];
+          _results.push(Function.fromJson(program, playerView2.game.families));
+        }
+        return _results;
+      })();
+      newView = new PlayerView3(playerView2, programs);
       functions = newView.functions;
       players = newView.game.players;
+      console.log(playerView2);
+      console.log(newView);
       _ref = json.impls;
       for (key in _ref) {
         mapitem = _ref[key];
@@ -611,9 +641,9 @@
         for (keykey in mapitem) {
           item = mapitem[keykey];
           if (__indexOf.call(newView.reviews[key], keykey) >= 0) {
-            newView[key][keykey].mergeJson(item, newView.impls, players);
+            newView.reviews[key][keykey].mergeJson(item, newView.impls, players);
           } else {
-            newView[key][keykey] = ImplReviewSet.fromJson(mapitem[keykey], newView.impls, players);
+            newView.reviews[key][keykey] = ImplReviewSet.fromJson(mapitem[keykey], newView.impls, players);
           }
         }
       }

@@ -89,7 +89,7 @@
       });
     };
 
-    ProblemServer.prototype.getView2 = function() {
+    ProblemServer.prototype.getView3 = function() {
       return this.http({
         method: 'GET',
         url: '/teamerapi/game/' + this.problem + '/getView3',
@@ -149,13 +149,13 @@
 
   angular.module('teamer', ['ngRoute']).config(function($routeProvider, $locationProvider) {
     return $routeProvider.when('/login', {
-      templateUrl: 'teamer/views/login.html',
+      templateUrl: '/teamer/views/login.html',
       controller: 'LoginController'
     }).when('/problem/:problem', {
-      templateUrl: 'teamer/views/problem.html',
+      templateUrl: '/teamer/views/problem.html',
       controller: 'ProblemController'
     }).otherwise({
-      templateUrl: 'teamer/views/null.html',
+      templateUrl: '/teamer/views/null.html',
       controller: 'InitController'
     });
   }).controller('LoginController', [
@@ -257,9 +257,11 @@
           $scope.game.mergeJson(data.data);
           return server.getView3();
         }).then(function(data) {
-          $scope.view3 = Model.PlayerView3.fromJson(data.data, $scope.view);
-          $scope.view.createImplForProgram();
-          return $scope.stage = 3;
+          $scope.view3 = Model.PlayerView3.fromJson(data.data, $scope.view2);
+          $scope.view3.createImplsForProgram();
+          $scope.stage = 3;
+          $scope.activeImpl = null;
+          return $scope.activeReview = null;
         })["catch"](function(error) {
           return $scope.error = error;
         });
