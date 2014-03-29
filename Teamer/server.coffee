@@ -57,8 +57,8 @@ PROBS_PER_PLAYER = 1
 FUNCS_PER_PLAYER = 3
 IMPLS_PER_FUNC = 3
 STAGE_TIMES = [0
-               1000 * 15
-               1000 * 25
+               1000 * 30
+               1000 * 30
                1000 * 60 * 21]
 
 class PlayerRegistry

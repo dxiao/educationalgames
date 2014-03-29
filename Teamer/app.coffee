@@ -220,7 +220,7 @@ angular.module 'teamer', ['ngRoute']
         $scope.view3.createImplsForProgram()
         $scope.stage = 3
         $scope.activeImpl = null
-        $scope.activeReview = null
+        $scope.activeReviewSet = null
       .catch (error) ->
         $scope.error = error
 

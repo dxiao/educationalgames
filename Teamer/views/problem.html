@@ -52,9 +52,7 @@
             <li class="list-group-item" ng-repeat="review in view3.getReviewList()" 
                 ng-click="openReview(review)" ng-class="{active: activeReview == review}">
               {{ review.impl.player.name }}'s {{ review.impl.function.name }}
-              <span class='pull-right glyphicon glyphicon-unchecked' ng-if="review._dirty === undefined"></span>
-              <span class='pull-right glyphicon glyphicon-check' ng-if="review._dirty === false"></span>
-              <span class='pull-right glyphicon glyphicon-edit' ng-if="review._dirty === true"></span>
+              <span class="badge">{{ review.rating.num }}/{{ review.rating.denom }}</span>
             </li>
           </ul>
         </div>
@@ -164,8 +162,9 @@
             </div>
           </form>
         </div>
-        <div ng-if="activeReviewSet">
+        <div class="border" ng-if="activeReviewSet">
           <h1>{{ activeReviewSet.impl.function.name }}</h1>
+          <div style="float: right;">Score: {{ activeReviewSet.rating.num }}/{{ activeReviewSet.rating.denom }}</div>
           <p class="family-description">{{ activeReviewSet.impl.function.family.description }}</p>
           <p class="function-description">{{ activeReviewSet.impl.function.description }}</p>
           <h3>{{ activeReviewSet.impl.player.name }}'s Solution:</h3>

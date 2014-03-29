@@ -30,3 +30,14 @@ bring functions screen all way to bottom
 allow solutions to change in 2?
 
 don't let Bob see Alice's reviews on Bob's code
+
+Literature:
+
+formative assessment
+  the stuff you value, allow them to do
+  How People Learn
+  Intelligent Tutors
+MacArthur Foundation - Barry Fishman (UMichigan) Bill Pennual
+Journal of Learning Sciences
+
+

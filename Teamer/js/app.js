@@ -261,7 +261,7 @@
           $scope.view3.createImplsForProgram();
           $scope.stage = 3;
           $scope.activeImpl = null;
-          return $scope.activeReview = null;
+          return $scope.activeReviewSet = null;
         })["catch"](function(error) {
           return $scope.error = error;
         });
