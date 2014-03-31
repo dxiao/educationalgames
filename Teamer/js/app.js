@@ -201,7 +201,7 @@
     }
   ]).controller('ProblemController', [
     '$scope', 'playerAuth', 'problemServer', '$timeout', function($scope, playerAuth, server, $timeout) {
-      var endStageOne, endStageTwo, refreshImplFromEditor, startStageThree, startStageTwo;
+      var clearImplInfo, endStageOne, endStageTwo, refreshImplFromEditor, startStageThree, startStageTwo;
       if (!playerAuth.assertLoggedIn()) {
         return;
       }
@@ -277,8 +277,17 @@
           return $scope.error = error;
         });
       };
+      clearImplInfo = function() {
+        $scope.info = "";
+        $scope.error = "";
+        $scope.runResults = "";
+        if ($scope.activeImpl) {
+          return $scope.saveImpl;
+        }
+      };
       $scope.openImpl = function(impl) {
         console.log("PROBCTL: changing function to " + impl["function"].name);
+        clearImplInfo();
         return $scope.activeImpl = impl;
       };
       $scope.openReview = function(reviewSet) {
@@ -357,7 +366,12 @@
         var stageEndTime, timer, updateTime;
         stageEndTime = 0;
         updateTime = function() {
-          return element.text(dateFilter(stageEndTime - Date.now(), format));
+          var timeLeft;
+          timeLeft = stageEndTime - Date.now();
+          element.text(dateFilter(timeLeft, format));
+          if (timeLeft < 30 * 1000) {
+            return element.addClass("critical-time");
+          }
         };
         scope.$watch(attrs.countdownTimer, function(value) {
           stageEndTime = value;
@@ -379,7 +393,8 @@
           value: "use strict;",
           mode: "text/x-java",
           lineNumbers: true,
-          readOnly: readonly
+          readOnly: readonly,
+          indentUnit: 4
         });
         scope.codeEditor.editor = editor;
         scope.$watch(attrs["function"], function(value) {

@@ -232,8 +232,16 @@ angular.module 'teamer', ['ngRoute']
       .catch (error) ->
         $scope.error = error
 
+    clearImplInfo = () ->
+      $scope.info = ""
+      $scope.error = ""
+      $scope.runResults = ""
+      if $scope.activeImpl
+        $scope.saveImpl
+
     $scope.openImpl = (impl) ->
       console.log "PROBCTL: changing function to " + impl.function.name
+      clearImplInfo()
       $scope.activeImpl = impl
 
     $scope.openReview = (reviewSet) ->
@@ -303,7 +311,10 @@ angular.module 'teamer', ['ngRoute']
     (scope, element, attrs) ->
       stageEndTime = 0
       updateTime = () ->
-        element.text dateFilter stageEndTime - Date.now(), format
+        timeLeft = stageEndTime - Date.now()
+        element.text dateFilter timeLeft, format
+        if timeLeft < 30*1000
+          element.addClass "critical-time"
 
       scope.$watch attrs.countdownTimer, (value) ->
         stageEndTime = value
@@ -324,6 +335,7 @@ angular.module 'teamer', ['ngRoute']
         mode: "text/x-java"
         lineNumbers: true
         readOnly: readonly
+        indentUnit: 4
       }
       scope.codeEditor.editor = editor
       scope.$watch attrs.function, (value) ->
