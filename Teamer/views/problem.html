@@ -122,9 +122,9 @@
           <p class="function-description">{{ activeReviewSet.impl.function.description }}</p>
           <h3>{{ activeReviewSet.impl.player.name }}'s Solution:</h3>
           <function-editor function="activeReviewSet.impl" readonly></function-editor>
-          <div review-view class="alert" ng-hide="review.player.id == player.id"
+          <div review-view class="alert alert-info"
               ng-repeat="review in activeReviewSet.reviews">
-            <label style="display: block">{{ review.player.name }}'s thoughts:</label>
+              <label style="display: block">{{ review.player.name }} gives it a {{ review.rating }}:</label>
             {{ review.comment }}
           </div>
           <form ng-submit="submitReview()">

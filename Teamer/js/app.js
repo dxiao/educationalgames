@@ -371,6 +371,8 @@
           element.text(dateFilter(timeLeft, format));
           if (timeLeft < 30 * 1000) {
             return element.addClass("critical-time");
+          } else {
+            return element.removeClass("critical-time");
           }
         };
         scope.$watch(attrs.countdownTimer, function(value) {
@@ -412,7 +414,8 @@
   }).directive('reviewView', function() {
     return {
       link: function(scope, element, attrs) {
-        return scope.$watch("review.rating", function(value) {
+        var adjustRating;
+        adjustRating = function(value) {
           if (value === "0") {
             return element.addClass("alert-info").removeClass("alert-success").removeClass("alert-danger");
           } else if (value === "1") {
@@ -420,7 +423,9 @@
           } else if (value === "-1") {
             return element.addClass("alert-danger").removeClass("alert-info").removeClass("alert-success");
           }
-        });
+        };
+        adjustRating(scope.review.rating + "");
+        return scope.$watch("review.rating", adjustRating);
       }
     };
   }).service('playerAuth', PlayerAuth).service('problemServer', ProblemServer);

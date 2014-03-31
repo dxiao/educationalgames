@@ -315,6 +315,8 @@ angular.module 'teamer', ['ngRoute']
         element.text dateFilter timeLeft, format
         if timeLeft < 30*1000
           element.addClass "critical-time"
+        else
+          element.removeClass "critical-time"
 
       scope.$watch attrs.countdownTimer, (value) ->
         stageEndTime = value
@@ -350,7 +352,7 @@ angular.module 'teamer', ['ngRoute']
   .directive 'reviewView', () -> {
     #templateUrl: "teamer/partials/reviewView.html"
     link: (scope, element, attrs) ->
-      scope.$watch "review.rating", (value) ->
+      adjustRating = (value) ->
         if value == "0"
           element.addClass "alert-info"
             .removeClass "alert-success"
@@ -363,6 +365,9 @@ angular.module 'teamer', ['ngRoute']
           element.addClass "alert-danger"
             .removeClass "alert-info"
             .removeClass "alert-success"
+
+      adjustRating (scope.review.rating+"") # I know, it's a hack
+      scope.$watch "review.rating", adjustRating
   }
 
   .service 'playerAuth', PlayerAuth

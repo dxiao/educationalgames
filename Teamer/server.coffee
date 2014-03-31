@@ -41,8 +41,8 @@ FUNCS_PER_PLAYER = 3
 IMPLS_PER_FUNC = 3
 
 STAGE_TIMES = [0
-               1000 * 60 * 10
-               1000 * 60
+               1000 * 10
+               1000 * 60 * 5
                1000 * 60 * 21]
 
 # ------------- Externs --------------
@@ -76,6 +76,7 @@ compileAndRun = (impl, callback) ->
 problems = {}
 problems.sql = require("./problems/sql.coffee").suite
 problems.sqlite = require("./problems/sqlite.coffee").suite
+problems.friends = require("./problems/friends.coffee").suite
 
 class PlayerRegistry
   constructor: () ->
@@ -248,7 +249,7 @@ class FairAssigner
       assignment.push @itemsLeft.splice(n, 1)[0]
     return assignment
 
-game = new Game problems.sql
+game = new Game problems.friends
 gameList = { sql: game}
 
 # ------------- Server ---------------
