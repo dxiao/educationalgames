@@ -251,6 +251,7 @@ angular.module 'teamer', ['ngRoute']
       server.submitImpl $scope.activeImpl
       .then (data) ->
         $scope.info = data.data
+        console.log data.data
         $scope.activeImpl._dirty = false
       .catch (error) ->
         $scope.error = error
@@ -298,7 +299,7 @@ angular.module 'teamer', ['ngRoute']
       scope.codeEditor.editor = editor
       scope.$watch attrs.function, (value) ->
         unless value.code
-          value.code = "//Add your implementation (and documentation) here!\n\n\n\n\n"
+          value.code = "// This page intentionally left blank."
         editor.setValue value.code
         scope.activeImpl._dirty = true
       editor.on "change", () ->

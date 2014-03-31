@@ -6,6 +6,20 @@ else
   window.TeamerModel = Module
   _ = window.Utils
 
+implTemplate = """
+// Please do not edit the class name!
+public class {0} {
+
+    // Your function (and documentation) here:
+
+
+    static public void main(String args[]) {
+        // You can also edit this main method to check your function.
+        // It will be run on the server when you click submit.
+    }
+}
+"""
+
 # Problem Description
 
 Module.Function = class Function
@@ -44,6 +58,10 @@ Module.ProblemSuite = class ProblemSuite
 
 Module.Implementation = class Implementation
   constructor: (@function, @player, @code) ->
+    unless @code?
+      @code = _.format implTemplate, @getClassName()
+  getClassName: () ->
+    "C" + @function.name + @player.id
   toJson: () -> {
     function: @function.name
     player: @player.id
@@ -167,7 +185,7 @@ Module.PlayerView = class PlayerView
     @functions = []
     @impls = []
   createImplsForStage: (stage) ->
-    @impls = @impls.concat (new Implementation(func, @player, "") for func in @functions when func.stage == stage)
+    @impls = @impls.concat (new Implementation(func, @player) for func in @functions when func.stage == stage)
   toJson: () -> {
     player: @player.id,
     game: @game.name,

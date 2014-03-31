@@ -297,6 +297,7 @@
         console.log("PROBCTL: submitting implementation for " + $scope.activeImpl["function"].name);
         return server.submitImpl($scope.activeImpl).then(function(data) {
           $scope.info = data.data;
+          console.log(data.data);
           return $scope.activeImpl._dirty = false;
         })["catch"](function(error) {
           return $scope.error = error;
@@ -349,7 +350,7 @@
         scope.codeEditor.editor = editor;
         scope.$watch(attrs["function"], function(value) {
           if (!value.code) {
-            value.code = "//Add your implementation (and documentation) here!\n\n\n\n\n";
+            value.code = "// This page intentionally left blank.";
           }
           editor.setValue(value.code);
           return scope.activeImpl._dirty = true;

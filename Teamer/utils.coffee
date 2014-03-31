@@ -40,3 +40,7 @@ Module.mapToList = (map, additionalDepth) ->
     for key, val of map
       result.push val
   result
+
+Module.format = (str, args...) ->
+  return str.replace /{(\d+)}/g, (match, number) ->
+    return if args[number]? then args[number] else match

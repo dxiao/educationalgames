@@ -8,6 +8,7 @@ assert = require "assert"
 serialize = require "node-serialize"
 Model = require "./TeamerModel.coffee"
 Utils = require "./utils.coffee"
+Java = require "./java.js"
 
 # URL model:
 # /teamer/login
@@ -31,7 +32,20 @@ Utils = require "./utils.coffee"
 # //Stage 2:
 # getImplementations(token, problem)
 
+# ------------- Consts ---------------
+
 SAVE_STATE = false
+
+PROBS_PER_PLAYER = 1
+FUNCS_PER_PLAYER = 3
+IMPLS_PER_FUNC = 3
+
+STAGE_TIMES = [0
+               1000 * 60 * 5
+               1000 * 60
+               1000 * 60 * 21]
+
+# ------------- Externs --------------
 
 saveState = (label) ->
   unless SAVE_STATE
@@ -47,19 +61,21 @@ saveState = (label) ->
     getPlayerAndGame: getPlayerAndGame
   }), label
 
+
+compileAndRun = (impl, callback) ->
+  filename = impl.getClassName()
+  console.log "Running impl for " + filename
+  file = {
+    filename: filename
+    data: impl.code
+  }
+  Java.compileAndRun [file], "", filename, callback
+
 # ------------- Model ----------------
 
 problems = {}
 problems.sql = require("./problems/sql.coffee").suite
 problems.sqlite = require("./problems/sqlite.coffee").suite
-
-PROBS_PER_PLAYER = 1
-FUNCS_PER_PLAYER = 3
-IMPLS_PER_FUNC = 3
-STAGE_TIMES = [0
-               1000 * 30
-               1000 * 30
-               1000 * 60 * 21]
 
 class PlayerRegistry
   constructor: () ->
@@ -290,11 +306,15 @@ Module.useExpressServer = (app) ->
     [player, game] = getPlayerAndGame req, res
     unless player? then return
     console.log req.body
-    error = game.setImpl Model.Implementation.fromJson req.body, game.problem.functions, game.players
+    impl = Model.Implementation.fromJson req.body, game.problem.functions, game.players
+    error = game.setImpl impl
     if error?
       res.send 403, error
-    else
-      res.send 200
+    compileAndRun impl, (error, result) ->
+      if error?
+        res.send 500, error
+      else
+        res.send 200, result
 
   app.post "/teamerapi/game/:game/submitReview", (req, res) ->
     [player, game] = getPlayerAndGame req, res
