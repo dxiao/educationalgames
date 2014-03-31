@@ -132,6 +132,17 @@
       });
     };
 
+    ProblemServer.prototype.execImpl = function(impl) {
+      return this.http({
+        method: 'POST',
+        url: '/teamerapi/game/' + this.problem + '/execImpl',
+        params: {
+          id: this.id
+        },
+        data: impl.toShortJson()
+      });
+    };
+
     ProblemServer.prototype.submitReview = function(review) {
       return this.http({
         method: 'POST',
@@ -190,7 +201,7 @@
     }
   ]).controller('ProblemController', [
     '$scope', 'playerAuth', 'problemServer', '$timeout', function($scope, playerAuth, server, $timeout) {
-      var endStageOne, endStageTwo, startStageThree, startStageTwo;
+      var endStageOne, endStageTwo, refreshImplFromEditor, startStageThree, startStageTwo;
       if (!playerAuth.assertLoggedIn()) {
         return;
       }
@@ -292,15 +303,38 @@
         }
       };
       $scope.codeEditor = {};
-      $scope.submitImpl = function() {
-        $scope.activeImpl.code = $scope.codeEditor.editor.getValue();
+      refreshImplFromEditor = function() {
+        return $scope.activeImpl.code = $scope.codeEditor.editor.getValue();
+      };
+      $scope.saveImpl = function() {
+        refreshImplFromEditor();
         console.log("PROBCTL: submitting implementation for " + $scope.activeImpl["function"].name);
         return server.submitImpl($scope.activeImpl).then(function(data) {
           $scope.info = data.data;
-          console.log(data.data);
           return $scope.activeImpl._dirty = false;
         })["catch"](function(error) {
           return $scope.error = error;
+        });
+      };
+      $scope.saveAndExecImpl = function() {
+        refreshImplFromEditor();
+        console.log("PROBCTL: requesting execution for " + $scope.activeImpl["function"].name);
+        return server.submitImpl($scope.activeImpl).then(function(data) {
+          return server.execImpl($scope.activeImpl);
+        }).then(function(data) {
+          var results;
+          results = {
+            compile: data.data.compile.errors,
+            run: data.data.run
+          };
+          $scope.runResults = results;
+          return $scope.activeImpl._dirty = false;
+        })["catch"](function(error) {
+          var results;
+          results = {
+            error: error
+          };
+          return $scope.runResults = results;
         });
       };
       return $scope.submitReview = function() {

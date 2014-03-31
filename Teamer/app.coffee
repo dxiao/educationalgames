@@ -91,6 +91,14 @@ class ProblemServer
       data: impl.toJson()
     }
 
+  execImpl: (impl) ->
+    @http {
+      method: 'POST'
+      url: '/teamerapi/game/' + @problem + '/execImpl'
+      params: {id: @id}
+      data: impl.toShortJson()
+    }
+
   submitReview: (review) ->
     @http {
       method: 'POST'
@@ -245,16 +253,37 @@ angular.module 'teamer', ['ngRoute']
 
     $scope.codeEditor = {}
 
-    $scope.submitImpl = () ->
+    refreshImplFromEditor = () ->
       $scope.activeImpl.code = $scope.codeEditor.editor.getValue()
+
+    $scope.saveImpl = () ->
+      refreshImplFromEditor()
       console.log "PROBCTL: submitting implementation for " + $scope.activeImpl.function.name
       server.submitImpl $scope.activeImpl
       .then (data) ->
         $scope.info = data.data
-        console.log data.data
         $scope.activeImpl._dirty = false
       .catch (error) ->
         $scope.error = error
+
+    $scope.saveAndExecImpl = () ->
+      refreshImplFromEditor()
+      console.log "PROBCTL: requesting execution for " + $scope.activeImpl.function.name
+      server.submitImpl $scope.activeImpl
+      .then (data) ->
+        server.execImpl $scope.activeImpl
+      .then (data) ->
+        results = {
+          compile: data.data.compile.errors
+          run: data.data.run
+        }
+        $scope.runResults = results
+        $scope.activeImpl._dirty = false
+      .catch (error) ->
+        results = {
+          error: error
+        }
+        $scope.runResults = results
 
     $scope.submitReview = () ->
       console.log "PROBCTL: submitting review for " + $scope.activeReview.impl.function.name

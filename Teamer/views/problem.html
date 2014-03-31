@@ -76,12 +76,25 @@
           <h1>{{ activeImpl.function.name }}</h1>
           <p class="family-description">{{ activeImpl.function.family.description }}</p>
           <p class="function-description">{{ activeImpl.function.description }}</p>
-          <form ng-submit="submitImpl()">
+          <form ng-submit="saveAndExecImpl()">
             <div class="form-group">
               <function-editor function="activeImpl"></function-editor>
-              <button type="submit" class="btn btn-success">Save!</button>
+              <button type="submit" class="btn btn-success">Save and Execute</button>
             </div>
           </form>
+        </div>
+        <div ng-if="runResults">
+          <div ng-show="runResults.error" class="alert alert-warning">
+            {{ runResults.error }}
+          </div>
+          <div ng-show="runResults.compile" class="alert alert-danger">
+            Compile Errors:
+            <pre ng-repeat="error in runResults.compile"><code>{{ error.kind }} at {{ error.source }}:{{ error.lineNumber }},{{ error.columnNumber }}: {{ error.message }} </code></pre>
+          </div>
+          <div ng-show="runResults.run" class="alert alert-info">
+            Execution output:
+            <pre><code><span ng-repeat="line in runResults.run" ng-class="{stderr: line.err}">{{ line.str }}</span></code></pre>
+          </div>
         </div>
         <div ng-show="info" class="alert alert-success">
           {{ info }}

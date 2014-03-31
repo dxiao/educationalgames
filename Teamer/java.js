@@ -99,8 +99,8 @@ function java(zip, main) {
   child.stderr.setEncoding('utf8');
   child.stderr.on('data', stderr);
   
-  child.once('timeout', function() { out.push({ timeout: true }); });
-  child.once('close', function() { emitter.emit('done', null, out); });
+  child.once('timeout', function() { out.push({ timeout: true, str: "ERROR: execution timed out.", err: true }); });
+  child.once('close', function() { out.push({ str: "Execution Complete.", err: true  }); emitter.emit('done', null, out); });
   
   return emitter;
 }

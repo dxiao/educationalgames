@@ -41,7 +41,7 @@ FUNCS_PER_PLAYER = 3
 IMPLS_PER_FUNC = 3
 
 STAGE_TIMES = [0
-               1000 * 60 * 5
+               1000 * 60 * 10
                1000 * 60
                1000 * 60 * 21]
 
@@ -302,6 +302,19 @@ Module.useExpressServer = (app) ->
     unless player? then return
     res.json game.playerView3s[player.id].toJson()
 
+  app.post "/teamerapi/game/:game/execImpl", (req, res) ->
+    [player, game] = getPlayerAndGame req, res
+    unless player? then return
+    console.log req.body
+    impl = game.impls[req.body.func][req.body.player]
+    unless impl?
+      res.send 404, "Could not find impl " + req.body.func + "," + req.body.player
+    compileAndRun impl, (error, result) ->
+      if error?
+        res.send 500, error
+      else
+        res.send 200, result
+
   app.post "/teamerapi/game/:game/submitImpl", (req, res) ->
     [player, game] = getPlayerAndGame req, res
     unless player? then return
@@ -310,11 +323,8 @@ Module.useExpressServer = (app) ->
     error = game.setImpl impl
     if error?
       res.send 403, error
-    compileAndRun impl, (error, result) ->
-      if error?
-        res.send 500, error
-      else
-        res.send 200, result
+    else
+      res.send 200
 
   app.post "/teamerapi/game/:game/submitReview", (req, res) ->
     [player, game] = getPlayerAndGame req, res
