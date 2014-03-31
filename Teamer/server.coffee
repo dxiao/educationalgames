@@ -41,8 +41,8 @@ FUNCS_PER_PLAYER = 3
 IMPLS_PER_FUNC = 3
 
 STAGE_TIMES = [0
-               1000 * 10
-               1000 * 60 * 5
+               1000 * 60 * 3
+               1000 * 30
                1000 * 60 * 21]
 
 # ------------- Externs --------------
@@ -61,6 +61,32 @@ saveState = (label) ->
     getPlayerAndGame: getPlayerAndGame
   }), label
 
+testFrameWork = """
+import org.junit.runner.*;
+import org.junit.runners.JUnit4;
+import org.junit.*;
+
+@RunWith(JUnit4.class)
+public class Tester {
+
+  @Test
+  public void testAlwaysPasses() {
+  }
+
+  @Test
+  public void testStuff() {
+    String[] val = {0}.mostLikelyCouple(new String[] {"a b", "b c", "c a", "a d", "b d"});
+    Assert.assertTrue(("a".equals(val[0]) && "b".equals(val[1])) && ("a".equals(val[1]) && "b".equals(val[0])));
+  }
+  
+  /*
+  public static void main (String[] args) {
+    JUnitCore junit = new JUnitCore();
+    Result result = junit.run(Tester.class);
+  }
+  */
+}
+"""
 
 compileAndRun = (impl, callback) ->
   filename = impl.getClassName()
@@ -69,7 +95,14 @@ compileAndRun = (impl, callback) ->
     filename: filename
     data: impl.code
   }
-  Java.compileAndRun [file], "", filename, callback
+  tests = {
+    filename: "Tester"
+    data: Utils.format testFrameWork, filename
+  }
+  if impl.function.stage == 3
+    Java.compileAndRun [file, tests], "", "org.junit.runner.JUnitCore", callback
+  else
+    Java.compileAndRun [file], "", filename, callback
 
 # ------------- Model ----------------
 

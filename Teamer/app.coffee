@@ -108,7 +108,8 @@ class ProblemServer
     }
 
 angular.module 'teamer', ['ngRoute']
-  .config ($routeProvider, $locationProvider) ->
+  .config ($routeProvider, $locationProvider, $sceProvider) ->
+    $sceProvider.enabled false # HACKHACKHACKHACK
     $routeProvider
       .when '/login', {
         templateUrl: '/teamer/views/login.html'

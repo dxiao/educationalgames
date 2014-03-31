@@ -158,7 +158,8 @@
 
   })();
 
-  angular.module('teamer', ['ngRoute']).config(function($routeProvider, $locationProvider) {
+  angular.module('teamer', ['ngRoute']).config(function($routeProvider, $locationProvider, $sceProvider) {
+    $sceProvider.enabled(false);
     return $routeProvider.when('/login', {
       templateUrl: '/teamer/views/login.html',
       controller: 'LoginController'

@@ -118,8 +118,8 @@
         </div>
         <div ng-if="activeReviewSet">
           <h1>{{ activeReviewSet.impl.function.name }}</h1>
-          <p class="family-description">{{ activeReviewSet.impl.function.family.description }}</p>
-          <p class="function-description">{{ activeReviewSet.impl.function.description }}</p>
+          <p class="family-description" ng-bind-html="activeReviewSet.impl.function.family.description"></p>
+          <p class="function-description" ng-bind-html="activeReviewSet.impl.function.description"></p>
           <h3>{{ activeReviewSet.impl.player.name }}'s Solution:</h3>
           <function-editor function="activeReviewSet.impl" readonly></function-editor>
           <div review-view class="alert alert-info"
@@ -146,7 +146,7 @@
                   I dislike this implementation.
                 </input>
               </label>
-              <button type="submit" class="btn btn-success">Update</button>
+              <button type="submit" class="btn btn-success">Update Reviews</button>
             </div>
           </form>
         </div>
@@ -182,9 +182,9 @@
           <p class="function-description">{{ activeReviewSet.impl.function.description }}</p>
           <h3>{{ activeReviewSet.impl.player.name }}'s Solution:</h3>
           <function-editor function="activeReviewSet.impl" readonly></function-editor>
-          <div review-view class="alert"
+          <div review-view class="alert alert-info"
               ng-repeat="review in activeReviewSet.reviews">
-            <label style="display: block">{{ review.player.name }}'s thoughts:</label>
+              <label style="display: block">{{ review.player.name }} gives it a {{ review.rating }}:</label>
             {{ review.comment }}
           </div>
         </div>

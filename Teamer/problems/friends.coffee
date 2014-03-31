@@ -9,7 +9,9 @@ Module.suite = suite = new Model.ProblemSuite "friends"
 stageOne = new Model.FunctionFamily "stageOne", 1,
   "For this function, assume that everybody can be represented by a unique name."
 stageThree = new Model.FunctionFamily "stageThree", 3,
-  "For this program, assume that everybody can be represented by a unique name."
+  "For this program, please disregard the main method - your code will be run" +
+  "against test cases, which will assume the existence of this method:<br>" +
+  "<pre>public static String[] mostLikelyCouple (String[] friendships)</pre>"
 
 getFriends = new Model.Function "QuestionA", stageOne,
   "Given a list of friendships among some people " +

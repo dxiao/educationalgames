@@ -37,7 +37,7 @@ function nice() {
   return child;
 }
 
-const compiler = spawn('java', [ '-cp', 'bin', 'coconut.Compile' ]);
+const compiler = spawn('java', [ '-cp', 'bin:bin/junit.jar:bin/hamcrest-core.jar', 'coconut.Compile' ]);
 const queue = [];
 
 function javac(sources) {
@@ -80,7 +80,7 @@ byline(compiler.stdout).on('data', function(out) {
 function java(zip, main) {
   var emitter = new events.EventEmitter();
   
-  var child = nice('java', '-Djava.security.manager', '-cp', zip, main);
+  var child = nice('java', '-Djava.security.manager', '-cp', "bin:bin/junit.jar:bin/hamcrest-core.jar:" + zip, main);
   
   var out = [];
   var stdout = function(data) { out.append({ str: data }); };
