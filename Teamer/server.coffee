@@ -34,16 +34,16 @@ Java = require "./java.js"
 
 # ------------- Consts ---------------
 
-SAVE_STATE = false
+SAVE_STATE = true
 
 PROBS_PER_PLAYER = 1
 FUNCS_PER_PLAYER = 3
 IMPLS_PER_FUNC = 3
 
 STAGE_TIMES = [0
-               1000 * 60 * 3
-               1000 * 30
-               1000 * 60 * 21]
+               1000 * 60 * 12
+               1000 * 60 * 5
+               1000 * 60 * 10]
 
 # ------------- Externs --------------
 

@@ -249,7 +249,7 @@ Module.PlayerView3 = class PlayerView3
     @reviews = playerView2.reviews # func -> player -> review
     @programs = programs
   createImplsForProgram: () ->
-    @progImpls = (new Implementation(program, @player, "") for program in @programs)
+    @progImpls = (new Implementation(program, @player) for program in @programs)
 
   _makeToJson: (mapmapitem) ->
     mapmapjson = {}
