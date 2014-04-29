@@ -41,7 +41,7 @@ FUNCS_PER_PLAYER = 3
 IMPLS_PER_FUNC = 3
 
 STAGE_TIMES = [0
-               1000 * 60 * 12
+               1000 * 60 * 7
                1000 * 60 * 5
                1000 * 60 * 10]
 
